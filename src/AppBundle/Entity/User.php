@@ -145,6 +145,11 @@ class User extends BaseUser
     private $autoload_images;
 
     /**
+     * @var boolean
+     */
+    private $use_new_search = false;
+
+    /**
      * @var array
      */
 
@@ -786,6 +791,25 @@ class User extends BaseUser
     public function setAutoloadImages(bool $autoloadImages)
     {
         $this->autoload_images = $autoloadImages;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getUseNewSearch()
+    {
+        return $this->use_new_search;
+    }
+
+    /**
+     * @param boolean $useNewSearch
+     * @return User
+     */
+    public function setUseNewSearch(bool $useNewSearch)
+    {
+        $this->use_new_search = $useNewSearch;
 
         return $this;
     }

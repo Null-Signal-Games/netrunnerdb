@@ -126,4 +126,9 @@ AppBundle\Entity\User:
         last_activity_check:
             type: datetime
             nullable: true
+        use_new_search:
+            type: boolean
+            nullable: false
+            options:
+                default: false
     lifecycleCallbacks: {  }
