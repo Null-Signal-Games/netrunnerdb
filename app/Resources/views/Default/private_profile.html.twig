@@ -71,6 +71,14 @@
     <p class="help-block small">If you uncheck this box, images will be replaced by a text box that you can click to load the image.</p>
   </div>
 
+  <div class="checkbox">
+    <label>
+        <input type="checkbox" name="use_new_search" value="1" {% if user.useNewSearch %}checked{% endif %}>
+        Use new version of NRDB search functionality.
+    </label>
+    <p class="help-block small">If you check this box, the card search functionality will be used over the classic NRDB search.</p>
+  </div>
+
   <div class="form-group">
     <label for="color">Select a faction color for your username</label>
     {% for faction in factions %}

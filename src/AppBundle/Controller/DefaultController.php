@@ -71,6 +71,7 @@ class DefaultController extends Controller
         $notifMention = $request->get('notif_mention') ? true : false;
         $shareDecks = $request->get('share_decks') ? true : false;
         $autoloadImages = $request->get('autoload_images') ? true : false;
+        $useNewSearch = $request->get('use_new_search') ? true : false;
 
         $user->setFaction($faction_code);
         $user->setResume($resume);
@@ -79,6 +80,7 @@ class DefaultController extends Controller
         $user->setNotifMention($notifMention);
         $user->setShareDecks($shareDecks);
         $user->setAutoloadImages($autoloadImages);
+        $user->setUseNewSearch($useNewSearch);
 
         $entityManager->flush();
 
