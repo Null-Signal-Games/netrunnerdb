@@ -50,6 +50,7 @@ public trial : Public Trail
 spinny : Spin Doctor
 gotay : Government Takeover
 gotek : Government Takeover
+vipi : Virtual Intelligence, P.I.: "You Can Call Me Vic"
 
 # Misc
 baby : Symmetrical Visage
@@ -110,6 +111,9 @@ black tree : Jinteki: Personal Evolution
 white tree : Jinteki: Replicating Perfection
 red tree : Mti Mwekundu: Life Improved
 red black tree : Mti Mwekundu: Life Improved
+
+# Jinteki IDs associated with dairy products
+egg : AU Co.: The Gold Standard in Clones
 
 # Edward Kim
 full metal hacktivist : Edward Kim: Humanity's Hammer
