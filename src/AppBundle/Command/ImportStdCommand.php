@@ -506,8 +506,13 @@ class ImportStdCommand extends ContainerAwareCommand
             }
         }
 
-        // Special case faction cost for agenda and identity cards which will always have null values returned as 0.
-        if ($entityName == 'AppBundle\Entity\Card' && $fieldName == 'factionCost' && ($entity->getType()->getCode() == 'identity' || $entity->getType()->getCode() == 'agenda')) {
+        // Special case faction cost for identity cards which will always have null values returned as 0.
+        if ($entityName == 'AppBundle\Entity\Card' && $fieldName == 'factionCost' && $entity->getType()->getCode() == 'identity') {
+            return;
+        }
+
+        // Skip this for agendas without a faction cost in $newValue.
+        if ($entityName == 'AppBundle\Entity\Card' && $fieldName == 'factionCost' && $entity->getType()->getCode() == 'agenda' && ($newJsonValue === 0 || $newJsonValue === null)) {
             return;
         }
 
