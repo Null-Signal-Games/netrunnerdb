@@ -560,10 +560,10 @@ function check_startup_constraints() {
             return count + agenda['indeck'];
         }, 0);
 
-        if(num_five_threes > 3 && MWL['name'].includes("Startup Ban List 24.09")){
+        if(num_five_threes > 3 && (MWL['name'].includes("Startup Ban List 24.09") || MWL['name'].includes("Startup Ban List 26.03"))){
             $('#startupvalidation').text('More than 3 agendas included with 3 or more agenda points each.').show();
         }
-	else if(num_five_threes > 4 && MWL['name'].includes("Startup Balance Update 25.04")){
+        else if(num_five_threes > 4 && MWL['name'].includes("Startup Balance Update 25.04")){
             $('#startupvalidation').text('More than 4 agendas included with 3 or more agenda points each.').show();
         }
         else {
