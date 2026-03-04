@@ -1,0 +1,575 @@
+{% extends '/layout.html.twig' %}
+
+{% block title %}NetrunnerDB ✨✨✨ New Search ✨✨✨ Syntax{% endblock %}
+
+{% block body %}
+{% include '/Scripts/api.html.twig' %}
+{% include '/Scripts/panels.html.twig' %}
+
+<div class="container">
+
+  <h1>{{ block('title') }}</h1>
+
+  <p>This is the ✨✨✨ New Search Syntax ✨✨✨. <a href="{{ path('search_syntax') }}">The old search syntax</a> is also available.</p>
+
+  <p>The new Search Syntax supports richer search operations and more functionality with existing NRDB Search and is largely compatible expect for any differences called out below.</p>
+
+  <ul>
+    <li>A search query is a series of one or more conditions separated by one or more spaces (which acts as an implicit <code>and</code>) or explicit conjuctions (<code>and</code> and <code>or</code>):
+      <ul>
+        <li><code>condition1 condition2 condition3</code> - gets all cards that meet the requirements of all three conditions</li>
+      </ul>
+    </li>
+    <li>Multiple values for a given term can be provided with <code>|</code> ( acts as <code>or</code>) or <code>&amp;</code>.
+      <ul>
+        <li><code>text:"Runner is tagged"&amp;meat</code> will return all cards with both <code>Runner is tagged</code> and <code>meat</code> in their text.</li>
+        <li><code>text:"Runner is tagged"|meat</code> will return all cards with either <code>Runner is tagged</code> or <code>meat</code> in their text.</li>
+      </ul>
+    </li>
+    <li>Each condition must be some or all of the name of a card or a criteria search:
+      <ul>
+        <li><code>Street</code> - gets all cards with “Street” in their name</li>
+        <li><code>x:credit</code> - gets all cards with “credit” in their ability text (see below for the full list of accepted criteria)</li>
+      </ul>
+    </li>
+    <li>Note that conditions containing spaces must be surrounded with quotation marks:
+      <ul>
+        <li><code>"Street Magic"</code> or <code>x:"take all credits"</code></li>
+      </ul>
+    </li>
+    <li>Negation operators
+      <ul>
+        <li>In addition to using a match or negated match operator (like <code>faction!anarch</code>), you can preface any condition with <code>!</code> or <code>-</code> to negate the whole condition.</li>
+        <li><code>f:adam -card_type:resource</code> will return all non-resource Adam cards.</li>
+        <li><code>f:apex !card_type:event</code> will return all non-event Apex cards.</li>
+      </ul>
+    </li>
+    <li>Conjunctions and grouping
+      <ul>
+        <li>Explicit <code>and</code> and <code>or</code> conjunctions are supported by the Search Syntax.
+          <ul>
+            <li><code>t:identity and f:criminal</code> will return all Criminal Identities.</li>
+          </ul>
+        </li>
+        <li>Explicit parenthesis will control grouping.
+          <ul>
+            <li><code>(f:criminal or f:shaper) and t:identity</code> or <code>(f:criminal or f:shaper) t:identity</code> will return all Criminal or Shaper Identities.</li>
+          </ul>
+        </li>
+        <li>A literal <code>and</code> or one using a space will have a higher precedence than an <code>or</code>.
+          <ul>
+            <li><code>f:criminal or f:shaper and t:identity</code> and <code>f:criminal or f:shaper t:identity</code> will return all Criminal cards and Shaper Identities.</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>Multiple Printings
+      <ul>
+        <li>Only the latest printing of a card will be returned by default, but the <code>is_latest_printing</code> operand can be used to specify which printings are desired.</li>
+        <li><code>is_latest_printing:false</code> will return only earlier printings of cards.</li>
+        <li><code>num_printings>1 is_latest_printing:true|false</code> will return all printings for cards with multiple printings.</li>
+        <li><code>num_printings:3</code> will return all cards that have exactly 3 printings.</li>
+        <li><code>"Slot Machine" is_latest_printing:true|false</code> will return both versions of Slot Machine</li>
+      </ul>
+    </li>
+  </ul>
+
+  <hr>
+
+  <h2>Syntax</h2>
+  <p>This is an overview of the available operands and operators you can use to search for cards.</p>
+
+  <div class="panel-parent">
+
+    <div class="syntax-panel">
+      <h3 class="header">Field Types & Operators</h3>
+      <h4 class="subheader">There are 5 types of fields in the Search Filter:</h4>
+      <div class="body row">
+       <ul>
+        <li><strong>Array</strong> - supports the <code>:</code> (an element in the array is an exact match) and <code>!</code> (an element in the array is not an exact match) operators.
+          <ul>
+            <li><code>card_pool_ids:eternal|snapshot</code> returns all cards in the eternal or snapshot card pools.</li>
+            <li><code>card_pool!snapshot</code> returns all cards not in the snapshot card pool.</li>
+          </ul>
+        </li>
+        <li><strong>Boolean</strong> - supports the <code>:</code> (match) and <code>!</code> (negated match) operators.  <code>true</code>, <code>false</code>, <code>t</code>, <code>f</code>, <code>1</code>, and <code>0</code> are all acceptable values.
+          <ul>
+            <li><code>advanceable:true</code>, <code>advanceable:t</code>, and <code>advanceable:1</code> will all return all results where advanceable is true.</li>
+          </ul>
+        </li>
+        <li><strong>Date</strong> - supports the <code>:</code> (match),  <code>!</code> (negated match), <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, and <code>&gt;=</code> operators.  Requires date in <code>YYYY-MM-DD</code> format.
+          <ul>
+            <li><code>release_date&lt;=2020-01-01</code> will return everything with a release date less than or equal to New Year’s Day, 2020.</li>
+          </ul>
+        </li>
+        <li><strong>Integer</strong> - supports the <code>:</code> (match),  <code>!</code> (negated match), <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, and <code>&gt;=</code> operators.  Requires simple integer input.
+          <ul>
+            <li>For cards that have an X value, you can match with X, like <code>cost:X</code> (case insensitive).  an X value is treated as -1 behind the scenes.</li>
+          </ul>
+        </li>
+        <li><strong>String - LIKE</strong> - supports the <code>:</code> (LIKE) and <code>!</code> (NOT LIKE) operators if. Input is transformed to lower case and the <code>%</code> decorations are added automatically, turning a query like <code>title:street</code> into a SQL fragment like <code>LOWER(stripped_title) LIKE '%street%</code>.
+          <ul>
+            <li><code>title:clearance</code> returns everything with clearance in the title.</li>
+            <li><code>title!clearance</code> returns everything without clearance in the title.</li>
+          </ul>
+        </li>
+        <li><strong>String - Regular Expression</strong> - string fields support positive and negative matches against regular expressions wrapped slashes like <code>/PATTERN/</code>
+          <ul>
+            <li><code>_:/^b/ f:anarch t:program</code> returns all Anarch Programs starting with "b".</li>
+            <li><code>_!/^b/ f:anarch t:program</code> returns all Anarch Programs not starting with "b".</li>
+          </ul>
+        </li>
+      </ul>
+      </div>
+    </div>
+
+    <div class="syntax-panel">
+      <h3 class="header">Some examples</h3>
+      <div class="body row">
+        <ul>
+          <li><code>test</code> or <code>_:test</code> searches for cards "test" in their title</li>
+          <li><code>_:a _!b</code> searches for cards with "a" in their title but not "b"</li>
+          <li><code>t:asset</code> searches for all Assets</li>
+          <li><code>t:asset s:ambush</code> searches for every Asset that has the subtype Ambush</li>
+          <li><code>x:"make a run"</code> searches for all cards with the text "make a run"</li>
+          <li><code>t:asset|upgrade f:nbn</code> searches for all NBN cards that are Assets or Upgrades</li>
+          <li><code>f:anarch|shaper n&lt;3</code> searches for all Anarch or Shaper cards with a faction cost less than 3</li>
+          <li><code>t:ice s!barrier|sentry|"code gate"</code> searches for all ICE that are neither barrier, code gate nor sentry</li>
+          <li><code>r&lt;2013-01-01</code> searches for all cards released up to Jan 1, 2013</li>
+          <li><code>d:runner|corp</code> searches for all Runner or Corp cards</li>
+          <li><code>x:&#34;the Corp loses 1 credit&#34;</code> returns Amina, Corporate &#34;Grant&#34;, and Lamprey</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="syntax-panel">
+      <h3 class="header">Missing Features & Incompatibilities</h3>
+      <div class="body row">
+        <ul>
+          <li>Faction aliases (n, a, s, etc) are not supported yet</li>
+          <li>Rotation aliases (current, latest, standard, startup) are not supported yet. See format and snapshot operands.</li>
+          <li>Ban list aliases (active, latest) are not supported yet. See restriction operand.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <h2>Operands (including aliases and types)</h2>
+  <p>This section goes into further detail on each operand.</p>
+
+  <div class="panel-parent">
+
+    <div class="syntax-panel">
+      <h3 class="header">Card Pool (<code>card_pool</code>, <code>z</code>) - Array</h3>
+      <h4 class="subheader">Search for cards in specific card pools.</h4>
+      <div class="body row">
+        <p>Card pools are similar to the rotation operand in the old syntax, and represent a collection of card cycles and sets.</p>
+        <p>This operand searches for cards in specific card pools. Using it will filter out all cards not in the specified pools.</p>
+      </div>
+    </div>
+
+    <div class="syntax-panel">
+      <h3 class="header">Card Subtype (<code>card_subtype</code>, <code>s</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>text names for card subtypes, matched as lowercase.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Card Subtype Id (<code>card_subtype_id</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>card_subtype_ids for the card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Eternal Points (<code>eternal_points</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Concatenation of restriction_id and an Eternal Points value, joined by a hyphen, like eternal_points:eternal_points_list_22_09-2.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Format (<code>format</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>format_id for any format containing the card at any time.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Has Global Penalty (<code>has_global_penalty</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>restriction_id restricting the card with a global penalty, like has_global_penalty:napd_mwl_1_1.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Illustrator Id (<code>illustrator_id</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>illustrator_id for an illustrator for the printing.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Is Banned (<code>is_banned</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>restriction_id specifying the card as banned, like is_banned:standard_ban_list_22_08.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Is Restricted (<code>is_restricted</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>restriction_id specifying the card as banned, like is_restricted:standard_mwl_3_4_b.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Printings Released By (<code>printings_released_by</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>All organizations that have released printings for a card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Restriction Id (<code>restriction_id</code>, <code>b</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>restriction_id specifying the card for any reason, like: restriction_id:eternal_points_list_22_09</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Snapshot (<code>snapshot</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>snapshot_id of a snapshot containing a card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Universal Faction Cost (<code>universal_faction_cost</code>) - array</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Concatenation of restriction_id and a Universal Faction Cost value, joined by a hyphen, like universal_faction_cost:napd_mwl_1_2-3.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Additional Cost (<code>additional_cost</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Does the card text specify an additional cost to play?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Advanceable (<code>advanceable</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Is the card advanceable?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Gains Subroutines (<code>gains_subroutines</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Does the card text allow for adding or gaining subroutines?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">In Restriction (<code>in_restriction</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Is the card specified on any Restriction list?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Interrupt (<code>interrupt</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Does the card have an interrupt ability?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Is Latest Printing (<code>is_latest_printing</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Is this printing the latest printing for a card?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Is Unique (<code>is_unique</code>, <code>u</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Is the card unique?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">On Encounter Effect (<code>on_encounter_effect</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Does the card text specify an on encounter effect?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Performs Trace (<code>performs_trace</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Does the card perform a trace?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Rez Effect (<code>rez_effect</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Does the card have a rez effect?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Trash Ability (<code>trash_ability</code>) - boolean</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Does the card provide a trash ability?</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Release Date (<code>release_date</code>, <code>date_release</code>, <code>r</code>) - date</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The earliest release date for a card or the release date for the set for a printing.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Advancement Cost (<code>advancement_cost</code>, <code>g</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The advancement_cost value for an agenda. Accepts positive integers and X (case-insensitive).</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Agenda Points (<code>agenda_points</code>, <code>v</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The printed number of agenda points for the agenda.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Base Link (<code>base_link</code>, <code>l</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The printed link value for an Identity.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Cost (<code>cost</code>, <code>o</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The printed cost of a card. Accepts positive integers and X (case-insensitive).</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Influence Cost (<code>influence_cost</code>, <code>n</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The influence cost or number of influence pips for the card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Link Provided (<code>link_provided</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The amount of link provided.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Memory Usage (<code>memory_usage</code>, <code>m</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The memory (MU) cost of this card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Mu Provided (<code>mu_provided</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The amount of memory (MU) provided by the card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Num Printed Subroutines (<code>num_printed_subroutines</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The number of printed subroutines on this card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Minimum Deck Size (<code>minimum_deck_size</code>, <code>min_deck_size</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The minimum deck size required by an Identity.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Num Printings (<code>num_printings</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>Count of unique printings for this card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Position (<code>position</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The position of the printing in a card set.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Quantity (<code>quantity</code>, <code>y</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The number of copies of a printing in the set.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Recurring Credits Provided (<code>recurring_credits_provided</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The number of recurring credits provided by this card. Accepts integers or X.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Strength (<code>strength</code>, <code>p</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The strength of the card. Accepts integers or X.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Trash Cost (<code>trash_cost</code>, <code>h</code>) - integer</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The trash cost of this card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Attribution (<code>attribution</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The designer of this card text, if specified.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Card Cycle (<code>card_cycle</code>, <code>c</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>card_cycle_id for a printing.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Card Id (<code>card_id</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>card_id for a printing.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Card Set (<code>card_set</code>, <code>e</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>card_set_id for printing.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Card Type (<code>card_type</code>, <code>t</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>card_type_id of this card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Designed By (<code>designed_by</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The organization that designed the card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Illustrator (<code>illustrator</code>, <code>i</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The printed version of the illustrator credits, with multiple illustrators separated by commas.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Faction (<code>faction</code>, <code>f</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>faction_id of this card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Flavor (<code>flavor</code>, <code>flavour</code>, <code>a</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The flavor text for a printing.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Released By (<code>released_by</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The organization that released the printing.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Side (<code>side</code>, <code>d</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>side_id of the card.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Text (<code>text</code>, <code>x</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The text of a card, stripped of all formatting symbols and marks.</p>
+      </div>
+    </div>
+    <div class="syntax-panel">
+      <h3 class="header">Title (<code>title</code>, <code>_</code>) - string</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p>The title of a card, stripped of all formatting symbols and marks.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+async function buildSyntaxView() {
+
+  // Rebuild each section with dynamic panels
+  $('.panel-parent').each(function(i) {
+    const panelList = new PanelList($(this), null, false, ...(i == 1 ? ["search", "toggle"] : [])); // The first one doesn't need toggles or searching
+
+    // Replace the static panels with dynamic ones
+    $(this).find('.syntax-panel').each(function(j) {
+      const panel = panelList.createPanel(`syntax-panel-${i}-${j}`, false);
+      panel.addHeader($(this).find('.header').html());
+      const subheader = $(this).find('.subheader').html();
+      if (subheader) {
+        panel.addSubheader(subheader);
+      }
+      panel.addBody().addBodyContent($(this).find('.body').html());
+      $(this).remove();
+    });
+  });
+
+}
+
+// Create the syntax view on load
+buildSyntaxView();
+</script>
+{% endblock %}

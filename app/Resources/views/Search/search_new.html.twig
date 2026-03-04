@@ -1,0 +1,522 @@
+{% extends '/layout.html.twig' %}
+
+{% block title %}New Card Search{% endblock %}
+
+{% block body %}
+{% include '/Scripts/api.html.twig' %}
+
+<div class="container">
+
+  <div id="list">
+
+    <div class="row">
+      <div class="col-sm-12">
+        <h2>New Search </h2>
+        <p>This page uses the <a href="{{ path('search_syntax_new') }}">✨✨✨ New Search Syntax ✨✨✨</a> to enable new features and offer a faster search experience. The <a href="{{ path('cards_find') }}">old search experience is still available</a>.</p>
+        <p>If you love this experience, you can set it to be your default by selecting "Use new version of NRDB search functionality." in your Account Profile and saving.</p>
+        <p>Results default to the latest printings only.  To see all printings, add <code>is_latest_printing:false|true</code> to your query.</p>
+        <hr>
+     </div>
+    </div>
+
+    <div class="row">
+       <div class="col-sm-4">
+        <div class="input-group" style="margin-bottom:.5em">
+          <input class="form-control" placeholder="Card Search" size="200" id="q" name="q" value="{{ query }}">
+
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="button" id="search_btn">Search</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="col-sm-4" style="margin-bottom:.5em">
+        <select id="sort_field" name="sort_field" class="form-control">
+            <option value="title" {% if sort == 'title' %}selected{% endif %}>Sort by Title</option>
+            <option value="card_set_id" {% if sort == 'card_set_id' %}selected{% endif %}>Sort by Set Name</option>
+            <option value="date_release" {% if sort == 'date_release' %}selected{% endif %}>Sort by Release Date</option>
+            <option value="faction_id" {% if sort == 'faction_id' %}selected{% endif %}>Sort by Faction</option>
+            <option value="card_type_id" {% if sort == 'card_type_id' %}selected{% endif %}>Sort by Type</option>
+            <option value="cost" {% if sort == 'cost' %}selected{% endif %}>Sort by Cost</option>
+            <option value="strength" {% if sort == 'strength' %}selected{% endif %}>Sort by Strength</option>
+        </select>
+      </div>
+
+      <div class="col-sm-4" style="margin-bottom:.5em">
+        <select id="view_type" name="view_type" class="form-control">
+            <option value="table" {% if view == 'table' %}selected{% endif %}>View as Checklist</option>
+            <option value="text" {% if view == 'text' %}selected{% endif %}>View as Text Only</option>
+            <option value="full" {% if view == 'full' %}selected{% endif %}>View as Full Cards</option>
+            <option value="images" {% if view == 'images' %}selected{% endif %}>View as Images Only</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row" id="loading_row"></div>
+    <div class="row" id="error_row"></div>
+
+    <table id="card_results_table" style="display:none" class="rwd-table table table-striped table-condensed">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Faction</th>
+          <th title="Cost"><span class="icon icon-credit"></span></th>
+          <th>Type</th>
+          <th title="Strength/Agenda Points/Trash Cost">…</th>
+          <th>Subtype</th>
+          <th title="Influence">•</th>
+          <th>Set</th>
+        </tr>
+      </thead>
+      <tbody id="card_results_table_body"></tbody>
+    </table>
+
+    <div id="card_results_full" class="row" style="display:none"></div>
+
+    <div class="row">
+    </div>
+  </div>
+</div>
+
+<script>
+// Query input and search button.
+$('#search_btn').on("click", function(e) {
+  doSearch();
+});
+$('#q').on("keyup", function(e) {
+  if (e.keyCode == 13) {
+    doSearch();
+  }
+});
+
+// Sort field selector.
+$('#sort_field').on('change', function(e) {
+  if (searchResults == null) {
+    return;
+  }
+
+  localStorage.setItem('new_search_sort', e.target.value);
+
+  resetContainers();
+  setToLoading();
+
+  sortResults();
+
+  clearLoading();
+
+  // API Server error.
+  if (searchResults.errors) {
+    $('#error_row').append(`
+      <div class="col-sm-12" style="margin-top:10px">
+        <p class="alert alert-danger">An error occurred: ${searchResults.errors[0].detail}</p>
+      </div>
+    `);
+    $('#error_row').show();
+    return;
+  }
+
+  // No results found.
+  if (searchResults.data.length === 0) {
+    $('#error_row').append(`
+      <div class="col-sm-12" style="margin-top:10px">
+        <p class="alert alert-warning">No results found.</p>
+      </div>
+    `);
+    $('#error_row').show();
+    return;
+  }
+
+  populateResults();
+  displayResults();
+});
+
+// Display view type selector.
+$('#view_type').on('change', function(e) {
+  const t = e.target;
+  localStorage.setItem('new_search_view', t.value);
+
+  // Hide all containers.
+  for (o of t.options) {
+    const e = $(`#card_results_${o.value}`);
+    if (e.length && !o.selected) {
+      e.hide();
+    } else if (o.value == 'text') {
+      $('[id^="card_results_text_row_"]').hide();
+    } else if (o.value == 'images') {
+      $('[id^="card_results_images_row_"]').hide();
+    }
+  }
+
+  // Show selected containers.
+  for (o of t.options) {
+    const e = $(`#card_results_${o.value}`);
+    if (e.length && o.selected) {
+        e.show();
+    } else if (o.selected && o.value == 'text') {
+      $('[id^="card_results_text_row_"]').show();
+    } else if (o.selected && o.value == 'images') {
+      $('[id^="card_results_images_row_"]').show();
+    }
+  }
+});
+
+
+let lastSearchQuery = null;
+let [searchResults, cardSets, cardCycles, cardTypes, factions] = [null, null, null, null, null];
+const cardCycleMap = new Map();
+const cardSetMap = new Map();
+const cardTypeMap = new Map();
+const factionMap = new Map();
+function textOnlyCard(card) {
+  return '';
+}
+
+function setSortAndViewDefaults() {
+  const sortSelector = $('#sort_field');
+  const sortSetting = localStorage.getItem('new_search_sort');
+  const sortParam = new URLSearchParams(window.location.search).get('sort');
+  if ((sortParam == null || !$(`#sort_field option[value="${sortParam}"]`).length) && sortSetting != null && $(`#sort_field option[value="${sortSetting}"]`).length) {
+    sortSelector.val(sortSetting);
+  }
+
+  const viewSelector = $('#view_type');
+  const viewSetting = localStorage.getItem('new_search_view');
+  const viewParam = new URLSearchParams(window.location.search).get('view');
+  if ((viewParam == null || !$(`#view_type option[value="${viewParam}"]`).length) && viewSetting != null && $(`#view_type option[value="${viewSetting}"]`).length) {
+    viewSelector.val(viewSetting);
+  }
+}
+
+async function loadSupportingData() {
+  console.log('Loading supporting data...');
+  [cardSets, cardCycles, cardTypes, factions] = await Promise.all([
+      fetchJson(`{{ v3_api_url }}/api/v3/public/card_sets`),
+      fetchJson(`{{ v3_api_url }}/api/v3/public/card_cycles`),
+      fetchJson(`{{ v3_api_url }}/api/v3/public/card_types`),
+      fetchJson(`{{ v3_api_url }}/api/v3/public/factions`),
+  ]);
+  console.log('fetched supporting data...');
+  cardCycles.data.forEach((cc) => {
+    cardCycleMap.set(cc.id, cc);
+  })
+  cardSets.data.forEach((cs) => {
+    cardSetMap.set(cs.id, cs);
+  })
+  cardTypes.data.forEach((t) => {
+    cardTypeMap.set(t.id, t);
+  })
+  factions.data.forEach((f) => {
+    factionMap.set(f.id, f);
+  })
+}
+
+async function fetchResults() {
+  console.time('fetchResults');
+  let searchQuery = $('#q').val();
+  if (!searchQuery.includes('is_latest_printing:')) {
+    searchQuery += ' is_latest_printing:true';
+  }
+  [searchResults] = await Promise.all(
+    [
+      fetchJson(`{{ v3_api_url }}/api/v3/public/printings?&page[size]=5000&filter[search]=${encodeURIComponent(searchQuery)}`),
+    ]);
+  console.timeEnd('fetchResults');
+}
+
+function sortResults() {
+  // Sort results (this needs to refactored a bit so sorting can be done without refetching data).
+  searchResults.data.sort((a, b) => {
+    const sortBy = $('#sort_field').val();
+    if (sortBy == 'card_set_id') {
+      if (a.attributes[sortBy][0] < b.attributes[sortBy][0]) {
+        return -1;
+      } else if (a.attributes[sortBy][0] > b.attributes[sortBy][0]) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else {
+      if (a.attributes[sortBy] < b.attributes[sortBy]) {
+        return -1;
+      } else if (a.attributes[sortBy] > b.attributes[sortBy]) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  });
+}
+
+function populateResults() {
+  let rowNum = 0;
+  let textOnlyRowNum = 0;
+  let textOnlyCardNum = 0;
+  let textOnlyCardsPerRow = 3;
+  let imagesRowNum = 0;
+  let imagesCardNum = 0;
+  let imagesPerRow = 4;
+
+  searchResults.data.forEach( (card) => {
+    let rowType = rowNum % 2 == 0 ? 'even' : 'odd';
+    let cost = '';
+    if (card.attributes.card_type_id == 'agenda') {
+      cost = card.attributes.advancement_requirement;
+    } else if (!['corp_identity', 'runner_identity'].includes(card.attributes.card_type_id)) {
+      cost = card.attributes.cost;
+    }
+    let strengthAgendaPointsTrashCost = '';
+    if (['ice', 'program'].includes(card.attributes.card_type_id) && card.attributes.strength !== null) {
+      strengthAgendaPointsTrashCost = card.attributes.strength == -1 ? 'X' : card.attributes.strength;
+    } else if (card.attributes.card_type_id == 'agenda') {
+      strengthAgendaPointsTrashCost = card.attributes.agenda_points;
+    } else if (card.attributes.trash_cost !== null) {
+      strengthAgendaPointsTrashCost = card.attributes.trash_cost;
+    }
+    let influence = card.attributes.influence_cost > 0 ? card.attributes.influence_cost : 0;
+
+    let illustrators = [];
+    card.attributes.illustrator_names.forEach((illustrator) => {
+      const search = Routing.generate('cards_find', {type:'find', 'view':'images', 'q':`i:"${illustrator}"`});
+
+      illustrators.push(`<a href="${search}">${illustrator}</a>`);
+    });
+    let illustratorText = illustrators.join(' • ');
+
+    // Checklist view
+    let rowContents = `
+      <tr class="even">
+        <td data-th="Title">
+          <a href="${cardToLatestPrintingLink(card)}" class="card${card.attributes.date_release >= new Date().toISOString().substr(0,10) ? '-preview' : ''}" data-index="${card.attributes.latest_printing_id}" data-hasqtip="1">${card.attributes.title}</a>
+        </td>
+        <td data-th="Faction">
+          <div class="table-cell">
+            <svg class="typeIcon" data-icon-color="${card.attributes.faction_id.replaceAll('_', '-')}" aria-label="${card.attributes.faction_id.replaceAll('_', '-')}"><use xlink:href="/images/icons.svg#faction-${card.attributes.faction_id.replaceAll('_', '-')}"></use></svg>
+          </div>
+        </td>
+        <td data-th="Cost">${cost}</td>
+        <td data-th="Type">${cardTypeMap.get(card.attributes.card_type_id).attributes.name}</td>
+        <td data-th="…">${strengthAgendaPointsTrashCost}</td>
+        <td data-th="Subtype">${card.attributes.display_subtypes == null ? '' : card.attributes.display_subtypes}</td>
+        <td data-th="Influence">
+                    <span class="influence-${card.attributes.faction_id.replaceAll('_', '-')}" aria-label="${influence} Influence">${'●'.repeat(influence)}&nbsp;</span>
+                </td>
+        <td data-th="Set"><span class="icon icon-${card.attributes.card_cycle_id.replaceAll('_', '-')}"></span> ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position}</td>
+      </tr>`;
+    $('#card_results_table_body').append(rowContents);
+
+    // Text view
+    // Insert a new row every imagesPerColumn
+    if (textOnlyCardNum % textOnlyCardsPerRow == 0) {
+      textOnlyRowNum++;
+      $('#list').append(`<div class="row" id="card_results_text_row_${textOnlyRowNum}" style="display: none"></div>`);
+    }
+    textOnlyCardNum++;
+
+    let fakeCard = { text: card.attributes.text };
+
+    let cardProps = '';
+    if (card.attributes.card_type_id == 'agenda') {
+      cardProps = `Adv: ${card.attributes.advancement_requirement} &bull; Score: ${card.attributes.agenda_points}`;
+    } else if (['asset', 'upgrade'].includes(card.attributes.card_type_id)) {
+      cardProps = `Rez: ${card.attributes.cost} &bull; Trash: ${card.attributes.trash_cost} &bull; Influence: ${card.attributes.influence_cost}`;
+    } else if (card.attributes.card_type_id == 'corp_identity') {
+      cardProps = `Deck: ${card.attributes.minimum_deck_size} &bull; Influence: ${card.attributes.influence_limit ?? '∞'}`;
+    } else if (card.attributes.card_type_id == "runner_identity") {
+      cardProps = `Link: ${card.attributes.base_link} &bull; Deck: ${card.attributes.minimum_deck_size} &bull; Influence: ${card.attributes.influence_limit ?? '∞'}`;
+    } else if (['operation', 'event'].includes(card.attributes.card_type_id)) {
+      cardProps = `Cost: ${card.attributes.cost} ${card.attributes.trash_cost != null ? `&bull; Trash: ${card.attributes.trash_cost}` : ''} &bull; Influence: ${card.attributes.influence_cost}`;
+    } else if (['resource', 'hardware'].includes(card.attributes.card_type_id)) {
+      cardProps = `Install: ${card.attributes.cost} &bull; Influence: ${card.attributes.influence_cost}`;
+    } else if (card.attributes.card_type_id == "program") {
+      cardProps = `Install: ${card.attributes.cost} &bull; Memory: ${card.attributes.memory_units} &bull; Strength: ${card.attributes.strength ?? '-'} &bull; Influence: ${card.attributes.influence_cost}`;
+    } else if (card.attributes.card_type_id == "ice") {
+      cardProps = `Rez: ${card.attributes.cost} &bull; Strength: ${card.attributes.strength} ${card.attributes.trash_cost != null ? `&bull; Trash: ${card.attributes.trash_cost}` : ''} &bull; Influence: ${card.attributes.influence_cost}`;
+    }
+
+    $(`#card_results_text_row_${textOnlyRowNum}`).append(`
+      <div class="col-sm-4" style="margin-bottom:1.5em">
+        <h4>
+          <a href="${cardToLatestPrintingLink(card)}" class="card-title${card.attributes.date_release >= new Date().toISOString().substr(0,10) ? ' card-preview' : ''}">${card.attributes.title}</a>
+        </h4>
+        <div class="card-info">
+        <p>
+          <span class="card-type">${cardTypeMap.get(card.attributes.card_type_id).attributes.name}</span><span class="card-keywords">${card.attributes.display_subtypes == null ? '' : ': ' + card.attributes.display_subtypes}</span>
+        </p>
+        <p class="card-props">
+          ${cardProps}
+        </p>
+      </div>
+        <div class="card-text border-${card.attributes.faction_id.replaceAll('_', '-')}">
+          ${NRDB.format.text(fakeCard)}
+        </div>
+        <p class="card-flavor" style="font-size:86.5%">
+          ${card.attributes.flavor == null ? '' : card.attributes.flavor + '<br>'}
+          ${card.attributes.attribution == null ? '' : '<strong>' + card.attributes.attribution + '</strong>'}
+        </p>
+        <p style="font-size:86.5%">${illustratorText}</p>
+        <p>
+          <span class="icon icon-${card.attributes.card_cycle_id.replaceAll('_', '-')}"></span> ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position} • ${factionMap.get(card.attributes.faction_id).attributes.name}
+        </p>
+      </div>
+    `);
+
+    // Image view
+    // Insert a new row every imagesPerColumn
+    if (imagesCardNum % imagesPerRow == 0) {
+      imagesRowNum++;
+      $('#list').append(`<div class="row" id="card_results_images_row_${imagesRowNum}" style="display: none"></div>`);
+    }
+    imagesCardNum++;
+
+    $(`#card_results_images_row_${imagesRowNum}`).append(`
+      <div class="col-sm-3" style="margin-bottom:30px">
+        <a href="${cardToLatestPrintingLink(card)}" class="no-popup"><img data-src="${card.attributes.images.nrdb_classic.large}" alt="${card.attributes.title}" style="width:100%" class="img-responsive card-image ls-is-cached lazyloaded" src="${card.attributes.images.nrdb_classic.large}"></a>
+      </div>
+    `);
+
+    // Full view
+    $('#card_results_full_contents').append(`
+      <div class="col-sm-7" style="margin-bottom:2em">
+        <div>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title card-title">
+                <a href="${cardToLatestPrintingLink(card)}" class="card-title" data-hasqtip="1" aria-describedby="qtip-1">${card.attributes.title}</a>
+              </h3>
+            </div>
+            <div class="panel-body">
+              <div class="card-info">
+                <span class="card-type">${cardTypeMap.get(card.attributes.card_type_id).attributes.name + (card.attributes.display_subtypes == null ? '' : ': ' + card.attributes.display_subtypes)}</span>
+                <span class="card-prop">&bull; ${cardProps}</span>
+              </div>
+              <div class="card-text border-${card.attributes.faction_id.replaceAll('_', '-')}">
+                ${NRDB.format.text(fakeCard)}
+              </div>
+              <div class="card-flavor">
+                <small>
+                  ${card.attributes.flavor == null ? '' : card.attributes.flavor + '<br>'}
+                  ${card.attributes.attribution == null ? '' : '<strong>' + card.attributes.attribution + '</strong>'}
+                </small>
+              </div>
+              <div class="card-illustrator">
+                <small>
+                ${factionMap.get(card.attributes.faction_id).attributes.name} •
+                ${illustratorText} •
+                <span class="icon icon-${card.attributes.card_cycle_id.replaceAll('_', '-')}"></span>
+                ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `);
+    $('#card_results_full_contents').append(`
+      <div class="col-sm-5" style="margin-bottom:2em">
+        <div class="card-image">
+          <img data-src="${card.attributes.images.nrdb_classic.large}" alt="${card.attributes.title}" class="img-responsive card-image ls-is-cached lazyloaded" style="margin:auto" src="${card.attributes.images.nrdb_classic.large}">
+        </div>
+      </div>
+    `);
+  });
+}
+
+// Show the desired display format.
+function displayResults() {
+  if ($('#view_type').val() == 'table') {
+    $('#card_results_table').show();
+  } else if ($('#view_type').val() == 'text') {
+    $('[id^="card_results_text_row_"]').show();
+  } else if ($('#view_type').val() == 'full') {
+    $('[id^="card_results_full"]').show();
+  } else if ($('#view_type').val() == 'images') {
+    $('[id^="card_results_images_row_"]').show();
+  }
+}
+
+function resetContainers() {
+  // Hide and reset containers.
+  $('#error_row').hide();
+  $('#error_row').empty();
+  $('#card_results_table').hide();
+  $('#card_results_table_body').empty();
+  $('#card_results_full').hide();
+  $('#card_results_full').empty();
+  $('#card_results_full').append('<div class="col-md-9"><div class="row" id="card_results_full_contents"></div></div>');
+  $('[id^="card_results_text_row_"]').hide();
+  $('[id^="card_results_text_row_"]').remove();
+  $('[id^="card_results_images_row_"]').hide();
+  $('[id^="card_results_images_row_"]').remove();
+}
+
+function setToLoading() {
+  // Add a temporary loading indicator
+  $('#loading_row').append(loading_icon);
+}
+
+function clearLoading() {
+  // Remove the loading indicator
+  $('.temp-loading').remove();
+}
+
+async function doSearch() {
+  let q = $('#q');
+
+  // Avoid duplicate API calls.
+  if (q.val().trim() == '' || lastSearchQuery == q.val()) {
+    return;
+  }
+
+  // Update history, but in an unhelpful way.  The URL changes, but the back/forward buttons don't do anything helpful ATM.
+  let url = new URL(window.location.href);
+  url.searchParams.set('q', q.val());
+  history.pushState(history.state, '', url.href);
+
+  lastSearchQuery = q.val();
+
+  resetContainers();
+  setToLoading();
+
+  await fetchResults();
+
+  clearLoading();
+
+  // API Server error.
+  if (searchResults.errors) {
+    $('#error_row').append(`
+      <div class="col-sm-12" style="margin-top:10px">
+        <p class="alert alert-danger">An error occurred: ${searchResults.errors[0].detail}</p>
+      </div>
+    `);
+    $('#error_row').show();
+    return;
+  }
+
+  // No results found.
+  if (searchResults.data.length === 0) {
+    $('#error_row').append(`
+      <div class="col-sm-12" style="margin-top:10px">
+        <p class="alert alert-warning">No results found.</p>
+      </div>
+    `);
+    $('#error_row').show();
+    return;
+  }
+
+  sortResults();
+  populateResults();
+  displayResults();
+}
+
+setSortAndViewDefaults();
+
+(async () => {
+  console.time('loadSupportingData');
+  loadSupportingData().then(() => {
+    console.timeEnd('loadSupportingData');
+    doSearch();
+});
+})();
+
+</script>
+{% endblock %}

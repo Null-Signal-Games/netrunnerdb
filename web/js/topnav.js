@@ -62,6 +62,10 @@ Promise.all([NRDB.data.promise, NRDB.ui.promise]).then(function() {
   $('#top_nav_card_search').keypress(function(event) {
     var keycode = (event.keyCode ? event.keyCode : event.which);
     if(keycode == '13'){
+      if (NRDB.user?.data?.use_new_search) {
+        let f = document.getElementById('top_nav_card_search_form');
+        f.action = Routing.generate('cards_find_v3', {}, true);
+      }
       $('#top_nav_card_search_form').submit();
     }
   });

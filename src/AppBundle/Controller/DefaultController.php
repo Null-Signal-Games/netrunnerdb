@@ -167,4 +167,29 @@ class DefaultController extends Controller
             "aliases" => $cardAliases,
         ], $response);
     }
+
+    /**
+     * @return Response
+     */
+    public function syntaxNewAction(EntityManagerInterface $entityManager, CardsData $cardsData)
+    {
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge($this->getParameter('long_cache'));
+
+        $banlists = $entityManager->getRepository(Mwl::class)->findBy([], ['dateStart' => 'DESC']);
+        $rotations = $entityManager->getRepository(Rotation::class)->findBy([], ['dateStart' => 'DESC']);
+        $cycles = $entityManager->getRepository('AppBundle:Cycle')->findBy([], ['position' => 'DESC']);
+        $packs = $entityManager->getRepository('AppBundle:Pack')->findBy([], ['dateRelease' => 'DESC']);
+        $cardAliases = $cardsData->getPrettyCardAliases();
+
+        return $this->render('/Default/syntax_new.html.twig', [
+            "pagetitle" => "New Search Syntax Reference",
+            "banlists" => $banlists,
+            "rotations" => $rotations,
+            "cycles" => $cycles,
+            "packs" => $packs,
+            "aliases" => $cardAliases,
+        ], $response);
+    }
 }

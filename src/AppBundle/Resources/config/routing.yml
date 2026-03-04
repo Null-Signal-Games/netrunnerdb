@@ -834,6 +834,11 @@ cards_find:
     defaults:
         _controller: AppBundle:Search:find
 
+cards_find_v3:
+    path:  /search_new/
+    defaults:
+        _controller: AppBundle:SearchNew:get
+
 cards_processSearchForm:
     path:  /process/
     defaults:
@@ -851,6 +856,14 @@ search_syntax:
     path: /{_locale}/syntax
     defaults:
         _controller: AppBundle:Default:syntax
+        _locale: en
+    requirements:
+        _locale: \w\w
+
+search_syntax_new:
+    path: /{_locale}/syntax_new
+    defaults:
+        _controller: AppBundle:Default:syntaxNew
         _locale: en
     requirements:
         _locale: \w\w
