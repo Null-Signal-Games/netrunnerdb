@@ -1144,6 +1144,14 @@ function build_jintekinet(deck) {
     var deck = process_deck_by_type(deck || SelectedDeck);
     var lines = [];
 
+    lines.push(";; identity: " + Identity.title);
+    lines.push(";; title: " + SelectedDeck.name);
+    var deckUrl = (typeof Decklist != "undefined" && Decklist != null)
+        ? location.origin + Routing.generate('decklist_view', {decklist_uuid: Decklist.uuid})
+        : location.origin + Routing.generate('deck_view', {deck_uuid: SelectedDeck.uuid});
+    lines.push(";; notes: " + deckUrl);
+    lines.push("");
+
     $('#deck-content > div > div > div').each(function (i, line) {
         var num = $(line).contents().filter(function () {
             return this.nodeType == 3;
