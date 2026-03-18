@@ -45,6 +45,7 @@ else
   ln -s "${CARDS_PATH}" netrunner-cards-json
 fi
 
+echo "Building docker images ..."
 if command -v docker compose >/dev/null 2>&1
 then
   docker compose build

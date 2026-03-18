@@ -22,6 +22,7 @@ nrdb-dev-env.
 cd ..
 git checkout https://github.com/netrunnerdb/netrunnerdb
 git checkout https://github.com/netrunnerdb/netrunner-cards-json
+cp -r netrunnerdb/docker nrdb-dev-env
 cd nrdb-dev-env
 ```
 
@@ -58,3 +59,11 @@ To update the card data, run:
 ```
 
 while your docker image is running.
+
+To reset your local setup, run:
+
+```sh
+docker-compose down -v
+rm netrunner-cards-json
+rm netrunnerdb
+```

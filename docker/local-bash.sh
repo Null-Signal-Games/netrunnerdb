@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker exec -it nrdb-dev bash
+docker exec -it -u www-data nrdb-dev bash
