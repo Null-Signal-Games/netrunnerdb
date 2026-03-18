@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\Deckchange" table="deckchange">
+    <indexes>
+      <index name="deck_saved_index" columns="deck_id,saved"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="dateCreation" type="datetime" column="date_creation"/>
+    <field name="variation" type="string" column="variation" length="1024"/>
+    <field name="saved" type="boolean" column="saved"/>
+    <many-to-one field="deck" target-entity="AppBundle\Entity\Deck" inversed-by="changes" fetch="LAZY">
+      <join-columns>
+        <join-column name="deck_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>
