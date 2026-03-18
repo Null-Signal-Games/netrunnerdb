@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\User" table="user">
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="reputation" type="integer" column="reputation" nullable="true"/>
+    <field name="faction" type="string" column="faction" nullable="false"/>
+    <field name="creation" type="datetime" column="creation" nullable="true"/>
+    <field name="resume" type="text" column="resume" nullable="true"/>
+    <field name="status" type="integer" column="status" nullable="true"/>
+    <field name="avatar" type="string" column="avatar" length="255" nullable="true"/>
+    <field name="donation" type="integer" column="donation" nullable="false"/>
+    <field name="patreon_pledge_cents" type="integer" column="patreon_pledge_cents" nullable="false">
+      <options>
+        <option name="default">0</option>
+      </options>
+    </field>
+    <field name="notif_author" type="boolean" column="notif_author" nullable="false">
+      <options>
+        <option name="default">1</option>
+      </options>
+    </field>
+    <field name="notif_commenter" type="boolean" column="notif_commenter" nullable="false">
+      <options>
+        <option name="default">1</option>
+      </options>
+    </field>
+    <field name="notif_mention" type="boolean" column="notif_mention" nullable="false">
+      <options>
+        <option name="default">1</option>
+      </options>
+    </field>
+    <field name="notif_follow" type="boolean" column="notif_follow" nullable="false">
+      <options>
+        <option name="default">1</option>
+      </options>
+    </field>
+    <field name="notif_successor" type="boolean" column="notif_successor" nullable="false">
+      <options>
+        <option name="default">1</option>
+      </options>
+    </field>
+    <field name="share_decks" type="boolean" column="share_decks" nullable="false">
+      <options>
+        <option name="default">0</option>
+      </options>
+    </field>
+    <field name="autoload_images" type="boolean" column="autoload_images" nullable="true">
+      <options>
+        <option name="default">1</option>
+      </options>
+    </field>
+    <field name="introductions" type="json_array" column="introductions" nullable="true"/>
+    <field name="soft_ban" type="boolean" column="soft_ban" nullable="false">
+      <options>
+        <option name="default">0</option>
+      </options>
+    </field>
+    <field name="last_activity_check" type="datetime" column="last_activity_check" nullable="true"/>
+    <field name="use_new_search" type="boolean" column="use_new_search" nullable="false">
+      <options>
+        <option name="default">0</option>
+      </options>
+    </field>
+    <one-to-many field="decks" target-entity="AppBundle\Entity\Deck" mapped-by="user" fetch="EXTRA_LAZY">
+      <cascade>
+        <cascade-remove/>
+      </cascade>
+      <order-by>
+        <order-by-field name="dateUpdate" direction="DESC"/>
+      </order-by>
+    </one-to-many>
+    <one-to-many field="decklists" target-entity="AppBundle\Entity\Decklist" mapped-by="user" fetch="LAZY"/>
+    <one-to-many field="comments" target-entity="AppBundle\Entity\Comment" mapped-by="author" fetch="LAZY">
+      <order-by>
+        <order-by-field name="dateCreation" direction="DESC"/>
+      </order-by>
+    </one-to-many>
+    <one-to-many field="reviews" target-entity="AppBundle\Entity\Review" mapped-by="user" fetch="EXTRA_LAZY">
+      <order-by>
+        <order-by-field name="dateCreation" direction="DESC"/>
+      </order-by>
+    </one-to-many>
+    <many-to-many field="favorites" target-entity="AppBundle\Entity\Decklist" mapped-by="favorites" fetch="LAZY">
+      <cascade>
+        <cascade-remove/>
+      </cascade>
+    </many-to-many>
+    <many-to-many field="votes" target-entity="AppBundle\Entity\Decklist" mapped-by="votes" fetch="LAZY">
+      <cascade>
+        <cascade-remove/>
+      </cascade>
+    </many-to-many>
+    <many-to-many field="reviewvotes" target-entity="AppBundle\Entity\Review" mapped-by="votes" fetch="LAZY">
+      <cascade>
+        <cascade-remove/>
+      </cascade>
+    </many-to-many>
+    <many-to-many field="following" target-entity="AppBundle\Entity\User" mapped-by="followers" fetch="LAZY"/>
+    <many-to-many field="followers" target-entity="AppBundle\Entity\User" inversed-by="following" fetch="LAZY">
+      <join-table name="follow">
+        <join-columns>
+          <join-column name="user_id" referenced-column-name="id"/>
+        </join-columns>
+        <inverse-join-columns>
+          <join-column name="follower_id" referenced-column-name="id"/>
+        </inverse-join-columns>
+      </join-table>
+    </many-to-many>
+  </entity>
+</doctrine-mapping>
