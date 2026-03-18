@@ -5,5 +5,8 @@ install:
 phpstan:
 	php vendor/bin/phpstan --memory-limit=-1 --verbose analyze src --level 3
 
+phpunit:
+	php vendor/bin/phpunit
+
 test:
 	vendor/bin/phpstan analyze src --level 7
