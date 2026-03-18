@@ -965,7 +965,7 @@ class CardsData
                         $state = 4;
                     }
                 } elseif (preg_match('/^\|(.*)/u', $query, $match)) { // token "|"
-                    if (($cond[1] == ':' || $cond[1] == '!') && (($state == 2 && isset($cond) && count($cond) > 2) || $state == 3)) {
+                    if (($cond[1] == ':' || $cond[1] == '!') && (($state == 2 && count($cond) > 2) || $state == 3)) {
                         $query = $match[1];
                         $state = 3;
                     } else {
