@@ -436,7 +436,7 @@ class ImportStdCommand extends ContainerAwareCommand
                     $this->entityManager->persist($mwl);
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $this->entityManager->getConnection()->rollBack();
                     throw $e;
                 }

@@ -15,6 +15,9 @@ use Psr\Log\LoggerInterface;
  */
 class ExportController extends Controller
 {
+    /** @var LoggerInterface $logger */
+    protected $logger;
+
     public function __construct(LoggerInterface $logger) {
         $this->logger = $logger;
     }
