@@ -94,7 +94,7 @@ class CleanupCommand extends ContainerAwareCommand
         $question = new ConfirmationQuestion("You selected $queryCount decklists ($periodPct% of period, $totalPct% of total). Do you really want to remove them? (y/N) ", false);
 
         if (!$helper->ask($input, $output, $question)) {
-            return;
+            return 0;
         }
 
 
