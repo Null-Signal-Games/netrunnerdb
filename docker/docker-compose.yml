@@ -72,8 +72,10 @@ services:
     container_name: nrdb-test-db
     image: "mysql:8"
     restart: always
+    tmpfs:
+      - /var/lib/mysql
     volumes:
-      - dbtestdata:/var/lib/mysql
+      - ./netrunnerdb/tests/fixtures/mysqldump:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: passwd
       MYSQL_DATABASE: nrdb-test
@@ -88,4 +90,3 @@ volumes:
   appdata_vendor:
   appdata_web:
   dbdata:
-  dbtestdata:
