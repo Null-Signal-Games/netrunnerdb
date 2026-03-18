@@ -76,7 +76,7 @@ class CardsData
     ) {
         $this->entityManager = $entityManager;
         $this->packRepository = $repositoryFactory->getPackRepository();
-        $this->mwlRepository = $entityManager->getRepository(Mwl::class);
+        $this->mwlRepository = $repositoryFactory->getMwlRepository();
         $this->router = $router;
         $this->packages = $packages;
         $this->illustrators = $illustrators;

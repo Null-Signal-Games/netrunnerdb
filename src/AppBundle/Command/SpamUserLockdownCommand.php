@@ -60,11 +60,11 @@ class SpamUserLockdownCommand extends ContainerAwareCommand
         $user = $userEntity->findOneBy(['username' => $username]);
         if (!($user instanceof User)) {
             $output->writeln('Could not find user ' . $username);
-            return;
+            return 1;
         }
         if ($confirmation != "cerebral overwriter") {
             $output->writeln("The confirmation phrase was not properly provided.  Exiting.");
-            return;
+            return 1;
         }
 
         $output-> writeln('===== User ==============');
