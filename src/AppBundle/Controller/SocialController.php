@@ -199,7 +199,7 @@ class SocialController extends Controller
     }
 
     /**
-     * @param int                    $deck_id
+     * @param int                    $decklist_id
      * @param EntityManagerInterface $entityManager
      * @return Response
      * @throws \Doctrine\DBAL\DBALException

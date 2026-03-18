@@ -62,5 +62,7 @@ class LegalityActiveMwlCommand extends ContainerAwareCommand
         }
 
         $this->entityManager->flush();
+
+        return 0;
     }
 }

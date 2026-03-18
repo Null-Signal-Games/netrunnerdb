@@ -66,7 +66,7 @@ class ClaimsController extends AbstractOauthController
             throw $this->createNotFoundException();
         }
 
-        /** @var Decklist $decklist */
+        /** @var Decklist|null $decklist */
         $decklist = null;
         if ($decklist_id > 0) {
             $decklist = $entityManager->getRepository('AppBundle:Decklist')->find($decklist_id);
@@ -114,7 +114,7 @@ class ClaimsController extends AbstractOauthController
             throw $this->createNotFoundException();
         }
 
-        /** @var Decklist $decklist */
+        /** @var Decklist|null $decklist */
         $decklist = null;
         if ($decklist_id > 0) {
             $decklist = $entityManager->getRepository('AppBundle:Decklist')->find($decklist_id);

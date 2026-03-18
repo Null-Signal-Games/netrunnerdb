@@ -66,6 +66,8 @@ class ModerationActionCommand extends ContainerAwareCommand
         $this->entityManager->refresh($decklist);
 
         $this->showStatus($decklist);
+
+        return 0;
     }
 
     protected function showStatus(Decklist $decklist)

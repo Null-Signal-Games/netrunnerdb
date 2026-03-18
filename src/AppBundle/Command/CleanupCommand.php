@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Service\DecklistManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -123,5 +124,7 @@ class CleanupCommand extends ContainerAwareCommand
         $this->entityManager->flush();
 
         $output->writeln("\nRemoved $queryCount decklists ($periodPct% of period, $totalPct% of total).");
+
+        return 0;
     }
 }

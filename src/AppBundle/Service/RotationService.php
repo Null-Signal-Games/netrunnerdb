@@ -5,6 +5,8 @@ namespace AppBundle\Service;
 use AppBundle\Entity\Cycle;
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\Rotation;
+use AppBundle\Repository\RotationRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -28,7 +30,9 @@ class RotationService
      */
     public function findCurrentRotation()
     {
-        $rotation = $this->entityManager->getRepository(Rotation::class)->createQueryBuilder('r')
+        /** @var RotationRepository $rotationRepository */
+        $rotationRepository = $this->entityManager->getRepository(Rotation::class);
+        $rotation = $rotationRepository->createQueryBuilder('r')
             ->where('r.dateStart <= CURRENT_DATE()')
             ->orderBy('r.dateStart', 'DESC')
             ->getQuery()
@@ -49,7 +53,9 @@ class RotationService
      */
     public function findLatestRotation()
     {
-        $rotation = $this->entityManager->getRepository(Rotation::class)->findOneBy([], ['dateStart' => 'DESC']);
+        /** @var RotationRepository $rotationRepository */
+        $rotationRepository = $this->entityManager->getRepository(Rotation::class);
+        $rotation = $rotationRepository->findOneBy([], ['dateStart' => 'DESC']);
 
         // There should always be a rotation available.
         if (!$rotation) {

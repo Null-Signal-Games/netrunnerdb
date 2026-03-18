@@ -64,5 +64,7 @@ class RebirthCommand extends ContainerAwareCommand
         $user->setEmail(str_replace("-was-a-damn-dirty-spammer", "", $user->getEmail()));
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        return 0;
     }
 }

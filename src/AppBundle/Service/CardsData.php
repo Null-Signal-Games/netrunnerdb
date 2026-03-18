@@ -9,6 +9,7 @@ use AppBundle\Entity\Pack;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\Ruling;
 use AppBundle\Entity\Rotation;
+use AppBundle\Repository\MWLRepository;
 use AppBundle\Service\Illustrators;
 use AppBundle\Service\RotationService;
 use AppBundle\Repository\PackRepository;
@@ -51,6 +52,9 @@ class CardsData
     /** @var PackRepository $packRepository */
     private $packRepository;
 
+    /** @var MWLRepository $mwlRepository */
+    private $mwlRepository;
+
     /** @var RouterInterface $router */
     private $router;
 
@@ -72,6 +76,7 @@ class CardsData
     ) {
         $this->entityManager = $entityManager;
         $this->packRepository = $repositoryFactory->getPackRepository();
+        $this->mwlRepository = $entityManager->getRepository(Mwl::class);
         $this->router = $router;
         $this->packages = $packages;
         $this->illustrators = $illustrators;
@@ -716,11 +721,11 @@ class CardsData
                 case 'b': // ban list
                     $mwl = null;
                     if ($condition[0] == "active") {
-                        $mwl = $this->entityManager->getRepository(Mwl::class)->findOneBy(['active' => 1], ["dateStart" => "DESC"]);
+                        $mwl = $this->mwlRepository->findOneBy(['active' => 1], ["dateStart" => "DESC"]);
                     } elseif ($condition[0] == "latest") {
-                        $mwl = $this->entityManager->getRepository(Mwl::class)->findOneBy([], ["dateStart" => "DESC"]);
+                        $mwl = $this->mwlRepository->findOneBy([], ["dateStart" => "DESC"]);
                     } else {
-                        $mwl = $this->entityManager->getRepository(Mwl::class)->findOneBy(['code' => $condition[0]], ["dateStart" => "DESC"]);
+                        $mwl = $this->mwlRepository->findOneBy(['code' => $condition[0]], ["dateStart" => "DESC"]);
                     }
                     if ($mwl) {
                         $cond = $operator == "!" ? "in" : "not in";
@@ -1067,7 +1072,7 @@ class CardsData
 
     public function getBannedCardCodesInArray(array $cards)
     {
-        $bannedCardCodes = $this->entityManager->getRepository(Mwl::class)->getBannedCardCodes();
+        $bannedCardCodes = $this->mwlRepository->getBannedCardCodes();
         $bannedCardCodesInOriginalArray = [];
 
         foreach ($cards as $card) {

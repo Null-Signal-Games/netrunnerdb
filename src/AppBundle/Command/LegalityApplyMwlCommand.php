@@ -112,5 +112,7 @@ class LegalityApplyMwlCommand extends ContainerAwareCommand
 
         $output->writeln("\n<info>Done</info>");
         $this->entityManager->flush();
+
+        return 0;
     }
 }
