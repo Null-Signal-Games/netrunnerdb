@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Behavior\Entity\NormalizableInterface;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\Cycle;
+use AppBundle\Entity\Mwl;
 use AppBundle\Entity\MwlCard;
 use AppBundle\Entity\Prebuilt;
 use AppBundle\Entity\Prebuiltslot;
@@ -186,6 +187,8 @@ class ImportStdCommand extends ContainerAwareCommand
         }
         $this->entityManager->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 
     protected function importSidesJsonFile(\SplFileInfo $fileinfo)
@@ -596,7 +599,7 @@ class ImportStdCommand extends ContainerAwareCommand
 
             $getter = 'get' . $foreignEntityShortName;
             if (!$entity->$getter() || $entity->$getter()->getId() !== $foreignEntity->getId()) {
-                $this->output->writeln("Changing the <info>$key</info> of <info>" . $entity . "</info>");
+                $this->output->writeln("Changing the <info>$key</info> of <info>" . get_class($entity) . "</info>");
                 $setter = 'set' . $foreignEntityShortName;
                 $entity->$setter($foreignEntity);
             }
@@ -619,7 +622,7 @@ class ImportStdCommand extends ContainerAwareCommand
         $newer = $entity->normalize();
 
         // special case for Mwl
-        if ($entityName === 'AppBundle\Entity\Mwl') {
+        if ($entity instanceof Mwl) {
             $newer['cards'] = $data['cards'];
             unset($newer['active']);
             unset($orig['active']);
@@ -634,16 +637,16 @@ class ImportStdCommand extends ContainerAwareCommand
         // difference is in the cycles already in the db for an existing entry,
         // we need to check that manually.  If those are the same, just let the
         // existing handling do its work.
-        if ($entityName === 'AppBundle\Entity\Rotation') {
+        if ($entity instanceof Rotation) {
             $json_cycles = $data['rotated'];
             sort($json_cycles);
             $db_cycles = array();
-            foreach ($entity->GetRotated() as $c) {
-                array_push($db_cycles, $c->GetCode());
+            foreach ($entity->getRotated() as $c) {
+                array_push($db_cycles, $c->getCode());
             }
             sort($db_cycles);
             if ($json_cycles != $db_cycles) {
-                $this->output->writeln("Cycles don't match for rotation <info>" . $entity->GetName() . "</info>, so updating it.");
+                $this->output->writeln("Cycles don't match for rotation <info>" . $entity->getName() . "</info>, so updating it.");
                 return $entity;
             }
         }

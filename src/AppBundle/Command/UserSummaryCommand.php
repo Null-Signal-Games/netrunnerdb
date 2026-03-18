@@ -116,5 +116,7 @@ class UserSummaryCommand extends ContainerAwareCommand
         $output->writeln("  # comments: {$num_comments}");
         $output->writeln("  # reviews: {$reviews->count()}");
         $output->writeln("  # reviewComments: {$num_reviewComments}");
+
+        return 0;
     }
 }

@@ -8,6 +8,8 @@ use AppBundle\Entity\Mwl;
 use AppBundle\Entity\Pack;
 use AppBundle\Entity\Rotation;
 use AppBundle\Entity\Type;
+use AppBundle\Repository\CardRepository;
+use AppBundle\Repository\PackRepository;
 use AppBundle\Service\CardsData;
 use AppBundle\Service\Illustrators;
 use AppBundle\Service\RotationService;
@@ -173,15 +175,16 @@ class SearchController extends Controller
             . " by Fantasy Flight Games.";
 
         // Find previous and next packs for navigation.
-        $em = $entityManager->getRepository('AppBundle:Pack');
-        $prev_pack = $em->createQueryBuilder('p')
+        /** @var PackRepository $packRepository */
+        $packRepository = $entityManager->getRepository('AppBundle:Pack');
+        $prev_pack = $packRepository->createQueryBuilder('p')
             ->where('p.dateRelease < :date_release')
             ->setParameter('date_release', $pack->getDateRelease())
             ->orderBy('p.dateRelease', 'DESC')
             ->getQuery()
             ->setMaxResults(1)
             ->getOneOrNullResult();
-        $next_pack = $em->createQueryBuilder('p')
+        $next_pack = $packRepository->createQueryBuilder('p')
             ->where('p.dateRelease > :date_release')
             ->setParameter('date_release', $pack->getDateRelease())
             ->orderBy('p.dateRelease', 'ASC')
@@ -725,8 +728,9 @@ class SearchController extends Controller
      */
     public function setnavigation(Card $card, string $locale, EntityManagerInterface $entityManager)
     {
-        $em = $entityManager->getRepository('AppBundle:Card');
-        $prev = $em->createQueryBuilder('c')
+        /** @var CardRepository $cardRepository */
+        $cardRepository = $entityManager->getRepository('AppBundle:Card');
+        $prev = $cardRepository->createQueryBuilder('c')
             ->andWhere('c.pack = :pack')
             ->andWhere('c.position < :position')
             ->setParameter('pack', $card->getPack())
@@ -735,7 +739,7 @@ class SearchController extends Controller
             ->getQuery()
             ->setMaxResults(1)
             ->getOneOrNullResult();
-        $next = $em->createQueryBuilder('c')
+        $next = $cardRepository->createQueryBuilder('c')
             ->andWhere('c.pack = :pack')
             ->andWhere('c.position > :position')
             ->setParameter('pack', $card->getPack())
