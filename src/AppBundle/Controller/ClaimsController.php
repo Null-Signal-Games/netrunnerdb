@@ -6,9 +6,7 @@ use AppBundle\Entity\Claim;
 use AppBundle\Entity\Client;
 use AppBundle\Entity\Decklist;
 use Doctrine\ORM\EntityManagerInterface;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -46,8 +44,7 @@ class ClaimsController extends AbstractOauthController
      * }
      *
      * @param Request $request
-     * @Route("")
-     * @Method("POST")
+     * @Route("", methods={"POST"})
      */
     public function postAction(string $decklist_id_or_uuid, Request $request, EntityManagerInterface $entityManager)
     {
@@ -145,8 +142,7 @@ class ClaimsController extends AbstractOauthController
     /**
      * Return a claim
      * @param integer $id
-     * @Route("/{id}")
-     * @Method("GET")
+     * @Route("/{id}", methods={"GET"})
      */
     public function getAction(string $decklist_id_or_uuid, $id, EntityManagerInterface $entityManager)
     {
@@ -158,8 +154,7 @@ class ClaimsController extends AbstractOauthController
     /**
      * Update a claim
      * @param integer $id
-     * @Route("/{id}")
-     * @Method("PUT")
+     * @Route("/{id}", methods={"PUT"})
      */
     public function putAction(string $decklist_id_or_uuid, int $id, Request $request, EntityManagerInterface $entityManager)
     {
@@ -186,8 +181,7 @@ class ClaimsController extends AbstractOauthController
     /**
      * Delete a claim
      * @param integer $id
-     * @Route("/{id}")
-     * @Method("DELETE")
+     * @Route("/{id}", methods={"DELETE"})
      */
     public function deleteAction(string $decklist_id_or_uuid, int $id, EntityManagerInterface $entityManager)
     {

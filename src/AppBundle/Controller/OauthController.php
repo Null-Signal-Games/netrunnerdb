@@ -3,8 +3,7 @@
 namespace AppBundle\Controller;
 
 use GuzzleHttp\Client;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,8 +21,7 @@ class OauthController extends Controller
 {
     /**
      * Display the API explorer
-     * @Route("/explorer")
-     * @Method("GET")
+     * @Route("/explorer", methods={"GET"})
      * @Template("/Oauth/explorer.html.twig")
      */
     public function explorerAction(Request $request)
@@ -42,8 +40,7 @@ class OauthController extends Controller
     /**
      * Display a page with "Connect to NetrunnerDB" button
      *
-     * @Route("/initiate")
-     * @Method("GET")
+     * @Route("/initiate", methods={"GET"})
      * @Template("/Oauth/initiate.html.twig")
      */
     public function initiateAction()
@@ -57,8 +54,7 @@ class OauthController extends Controller
     /**
      * Receive the authorization code and request an access token
      * @param Request $request
-     * @Route("/callback")
-     * @Method("GET")
+     * @Route("/callback", methods={"GET"})
      */
     public function callbackAction(Request $request)
     {

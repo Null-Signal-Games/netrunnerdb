@@ -126,8 +126,13 @@ stof_doctrine_extensions:
 
 fos_rest:
     routing_loader: false
+    body_listener: false
 
 nelmio_api_doc:
     sandbox:
         request_format:
               method: accept_header
+
+sensio_framework_extra:
+    router:
+        annotations: false
