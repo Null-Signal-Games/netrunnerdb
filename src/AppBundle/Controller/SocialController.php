@@ -745,7 +745,7 @@ class SocialController extends Controller
                     }
 
                     for ($i = 0; $i < $slot['influence']; $i++) {
-                        if ($i % 5 == 0) {
+                        if ($i % $slot['qty'] == 0) {
                             $inf .= " ";
                         }
                         $inf .= "•";
