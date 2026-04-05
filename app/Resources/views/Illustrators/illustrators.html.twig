@@ -45,7 +45,7 @@ async function buildIllustratorsView() {
     // Format the illustrator's printings into 3 columns
     panel.addBody();
     panel.onShow = async function() {
-      const printings = await fetchData(`{{ v3_api_url }}/api/v3/public/illustrators/${illustrator.id}/printings`);
+      const printings = await fetchData(illustrator.relationships.printings.links.related);
       const list = printings.map(p => `<li class="printing-title">${printingToAnchor(p)}</li><a href="${printingToLink(p)}" class="printing-image" style="display: none;"><img alt="${p.attributes.title}" style="width: 100%; margin-top: 16px;" class="img-responsive lazyloaded card-image" src="${p.attributes.images.nrdb_classic.large}"></a>`);
       panel.addBodyContent(`<div class="col-sm-4"><ul>${list.splice(0, Math.ceil(printings.length / 3)).join('')}</ul></div>`);
       panel.addBodyContent(`<div class="col-sm-4"><ul>${list.splice(0, Math.ceil(printings.length / 3)).join('')}</ul></div>`);
