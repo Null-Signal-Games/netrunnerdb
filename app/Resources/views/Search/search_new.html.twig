@@ -20,7 +20,7 @@
     </div>
 
     <div class="row">
-       <div class="col-sm-6">
+       <div class="col-sm-12">
         <div class="input-group" style="margin-bottom:.5em">
           <input class="form-control" placeholder="Card Search" size="200" id="q" name="q" value="{{ query }}">
 
@@ -28,6 +28,11 @@
             <button class="btn btn-primary" type="button" id="search_btn">Search</button>
           </span>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3" style="margin-bottom:.5em">
+        <select id="format" name="format" class="form-control"></select>
       </div>
 
       <div class="col-sm-2" style="margin-bottom:.5em">
@@ -37,7 +42,7 @@
         </select>
       </div>
 
-      <div class="col-sm-2" style="margin-bottom:.5em">
+      <div class="col-sm-4" style="margin-bottom:.5em">
         <select id="sort_field" name="sort_field" class="form-control">
             <option value="title" {% if sort == 'title' %}selected{% endif %}>Sort by Title</option>
             <option value="card_set_id" {% if sort == 'card_set_id' %}selected{% endif %}>Sort by Set Name</option>
@@ -49,9 +54,9 @@
         </select>
       </div>
 
-      <div class="col-sm-2" style="margin-bottom:.5em">
+      <div class="col-sm-3" style="margin-bottom:.5em">
         <select id="view_type" name="view_type" class="form-control">
-            <option value="table" {% if view == 'table' %}selected{% endif %}>View as Checklist</option>
+            <option value="table" {% if view == 'table' %}selected{% endif %}>View as Table</option>
             <option value="text" {% if view == 'text' %}selected{% endif %}>View as Text Only</option>
             <option value="full" {% if view == 'full' %}selected{% endif %}>View as Full Cards</option>
             <option value="images" {% if view == 'images' %}selected{% endif %}>View as Images Only</option>
@@ -178,7 +183,7 @@ $('#view_type').on('change', function(e) {
   }
 });
 
-let lastSearchQuery = null;
+let lastSearchUrl = null;
 let lastPrintingType = null;
 let [searchResults, cardSets, cardCycles, cardTypes, factions] = [null, null, null, null, null];
 let numResults = 0;
@@ -186,8 +191,18 @@ const cardCycleMap = new Map();
 const cardSetMap = new Map();
 const cardTypeMap = new Map();
 const factionMap = new Map();
+const formatMap = new Map();
+
+let formatFromController = '{{ format }}'
 
 function setDisplayDefaults() {
+  const formatSelector = $('#format');
+  const formatSetting = localStorage.getItem('new_search_format');
+  const formatParam = new URLSearchParams(window.location.search).get('format');
+  if ((formatParam == null || !$(`#format option[value="${formatParam}"]`).length) && formatSetting != null && $(`#format option[value="${formatSetting}"]`).length) {
+    formatSelector.val(formatSetting);
+  }
+
   const printingTypeSelector = $('#printing_type');
   const printingTypeSetting = localStorage.getItem('new_search_printing_type');
   const printingTypeParam = new URLSearchParams(window.location.search).get('printing_type');
@@ -212,11 +227,12 @@ function setDisplayDefaults() {
 
 async function loadSupportingData() {
   console.log('Loading supporting data...');
-  [cardSets, cardCycles, cardTypes, factions] = await Promise.all([
+  [cardSets, cardCycles, cardTypes, factions, formats] = await Promise.all([
       fetchJson(`{{ v3_api_url }}/api/v3/public/card_sets`),
       fetchJson(`{{ v3_api_url }}/api/v3/public/card_cycles`),
       fetchJson(`{{ v3_api_url }}/api/v3/public/card_types`),
       fetchJson(`{{ v3_api_url }}/api/v3/public/factions`),
+      fetchJson(`{{ v3_api_url }}/api/v3/public/formats`),
   ]);
   console.log('fetched supporting data...');
   cardCycles.data.forEach((cc) => {
@@ -231,15 +247,21 @@ async function loadSupportingData() {
   factions.data.forEach((f) => {
     factionMap.set(f.id, f);
   })
+  formats.data.forEach((f) => {
+    // Don't expose the RAM format.
+    if (f.id != 'ram') {
+      formatMap.set(f.id, f);
+    }
+  })
 }
 
-async function fetchResults() {
+function buildSearchUrl(query) {
+  return `{{ v3_api_url }}/api/v3/public/printings?&page[size]=5000&filter[search]=${encodeURIComponent(query)}`;
+}
+
+async function fetchResults(queryUrl) {
   console.time('fetchResults');
-  let searchQuery = $('#q').val();
-  [searchResults] = await Promise.all(
-    [
-      fetchJson(`{{ v3_api_url }}/api/v3/public/printings?&page[size]=5000&filter[search]=${encodeURIComponent(searchQuery)}`),
-    ]);
+  searchResults = await fetchJson(queryUrl);
   console.timeEnd('fetchResults');
 }
 
@@ -499,6 +521,7 @@ function clearLoading() {
 
 function setSearchControlState(isDisabled) {
   $('#q').prop('disabled', isDisabled);
+  $('#format').prop('disabled', isDisabled);
   $('#search_btn').prop('disabled', isDisabled);
   $('#printing_type').prop('disabled', isDisabled);
   $('#sort_field').prop('disabled', isDisabled);
@@ -509,18 +532,15 @@ function setSearchControlState(isDisabled) {
 async function doSearch() {
   let q = $('#q');
 
-  // Avoid duplicate API calls.
-  if (q.val().trim() == '' || lastSearchQuery == q.val().trim()) {
+  // Do not allow an empty search.
+  if (q.val().trim() == '') {
+    // In case any results were displayed, clear them.
+    resetContainers();
     return;
   }
 
   // Lock query fields.
-  setSearchControlState(true);
-
-  // Update history, but in an unhelpful way.  The URL changes, but the back/forward buttons don't do anything helpful ATM.
-  let url = new URL(window.location.href);
-  url.searchParams.set('q', q.val());
-  history.pushState(history.state, '', url.href);
+  setSearchControlState(true /* isDisabled */);
 
   lastPrintingType = $('#printing_type').val();
   let searchQuery = q.val().trim();
@@ -528,12 +548,29 @@ async function doSearch() {
   if (searchQuery.match(/is_latest_printing:/)) {
     $('#printing_type').val('any');
   }
-  lastSearchQuery = searchQuery;
+
+  if (!searchQuery.match(/format:/) && $('#format').val() != 'any') {
+    searchQuery += ` format:${$('#format').val()}`;
+  }
+  let searchUrl = buildSearchUrl(searchQuery);
+
+  // Exit and reset if the search URL has not changed to avoid unnecessary fetches.
+  if (lastSearchUrl == searchUrl) {
+    setSearchControlState(false /* isDisabled */);
+    return;
+  }
+
+  lastSearchUrl = searchUrl;
+
+  // Update history, but in an unhelpful way.  The URL changes, but the back/forward buttons don't do anything helpful ATM.
+  let url = new URL(window.location.href);
+  url.searchParams.set('q', q.val());
+  history.pushState(history.state, '', url.href);
 
   resetContainers();
   setToLoading();
 
-  await fetchResults();
+  await fetchResults(buildSearchUrl(searchQuery));
 
   clearLoading();
 
@@ -545,34 +582,61 @@ async function doSearch() {
       </div>
     `);
     $('#error_row').show();
+
+    // Unlock query fields.
+    setSearchControlState(false /* isDisabled */);
     return;
   }
 
-  // No results found.
   if (searchResults.data.length === 0) {
+    // No results found.
     $('#error_row').append(`
       <div class="col-sm-12" style="margin-top:10px">
         <p class="alert alert-warning">No results found.</p>
       </div>
     `);
     $('#error_row').show();
-    return;
+  } else {
+    // Results!
+    sortResults();
+    populateResults();
+    displayResults();
   }
-
-  sortResults();
-  populateResults();
-  displayResults();
-
   // Unlock query fields.
   setSearchControlState(false);
 }
-
-setDisplayDefaults();
 
 (async () => {
   console.time('loadSupportingData');
   loadSupportingData().then(() => {
     console.timeEnd('loadSupportingData');
+
+    // populate format selector and add event handler
+
+    $('#format').append(`<option value="any">Format: Any</option>`);
+    formatMap.forEach((format) => {
+      $('#format').append(`<option value="${format.id}" ${format.id == formatFromController ? 'selected' : ''}>Format: ${format.attributes.name} (active)</option>`);
+      $('#format').append(`<option value="${format.id}-latest" ${(format.id + "-latest") == formatFromController ? 'selected' : ''}>Format: ${format.attributes.name} (latest)</option>`);
+    });
+
+    setDisplayDefaults();
+
+    $('#format').on('change', function(e) {
+      if (searchResults == null || searchResults.errors) {
+        return;
+      }
+
+      // Update history, but in an unhelpful way.  The URL changes, but the back/forward buttons don't do anything helpful ATM.
+      let url = new URL(window.location.href);
+      url.searchParams.set('format', e.target.value);
+      history.pushState(history.state, '', url.href);
+      // Save format selection to local storage so it can be the default for future searches.
+      localStorage.setItem('new_search_format', e.target.value);
+
+      // Format changes *will* trigger new searches because the format is part of the search query.
+      doSearch();
+    });
+
     doSearch();
 });
 })();

@@ -315,11 +315,20 @@
     </div>
 
     <div class="syntax-panel">
-      <h3 class="header">Format (<code>format</code>) - array</h3>
+      <h3 class="header">Format (<code>format</code>) - format</h3>
+      <h4 class="subheader"></h4>
+      <div class="body row">
+        <p><code>format_id</code> to use the current active cardpool and banlist for a format or <code>format_id-latest</code> to use the latest version even if inactive.</p>
+        <div class="col-sm-6" id="format_values"></div>
+      </div>
+    </div>
+
+    <div class="syntax-panel">
+      <h3 class="header">Format ID (<code>format_id</code>) - array</h3>
       <h4 class="subheader"></h4>
       <div class="body row">
         <p>format_id for any format containing the card at any time.</p>
-        <div class="col-sm-6" id="format_values"></div>
+        <div class="col-sm-6" id="format_id_values"></div>
       </div>
     </div>
 
@@ -707,9 +716,14 @@ async function loadSupportingData() {
     factionIdValuesList.append(`<li><code>${f.id}</code> - ${f.attributes.name}</li>`);
   })
   const formatValuesList = $(`#format_values`).append(`<ul></ul>`);
+  const formatIdValuesList = $(`#format_id_values`).append(`<ul></ul>`);
   formats.data.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name)).forEach((f) => {
-    formatMap.set(f.id, f);
-    formatValuesList.append(`<li><code>${f.id}</code> - ${f.attributes.name}</li>`);
+    if (f.id != 'ram') {
+      formatMap.set(f.id, f);
+      formatValuesList.append(`<li><code>${f.id}</code> - ${f.attributes.name} (active)</li>`);
+      formatValuesList.append(`<li><code>${f.id}-latest</code> - ${f.attributes.name} (latest, even if inactive)</li>`);
+      formatIdValuesList.append(`<li><code>${f.id}</code> - ${f.attributes.name}</li>`);
+    }
   })
   const illustratorIdValuesList = $(`#illustrator_id_values`).append(`<ul></ul>`);
   illustrators.data.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name)).forEach((i) => {
