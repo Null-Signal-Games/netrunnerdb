@@ -550,7 +550,7 @@ async function doSearch() {
   }
 
   if (!searchQuery.match(/format:/) && $('#format').val() != 'any') {
-    searchQuery += ` format:${$('#format').val()}`;
+    searchQuery = `(${searchQuery}) format:${$('#format').val()}`;
   }
   let searchUrl = buildSearchUrl(searchQuery);
 
