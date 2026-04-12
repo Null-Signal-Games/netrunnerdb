@@ -39,7 +39,7 @@ class UserMigrationController extends Controller
      */
     public function getAction(string $username, Request $request)
     {
-        $errorResponse = $this->verifyRequest($request);
+        $errorResponse = $this->verifyRequest();
 
         if ($errorResponse > 0) {
             return new JsonResponse([], $errorResponse);
@@ -79,7 +79,7 @@ class UserMigrationController extends Controller
 
     public function postAction(string $username, Request $request)
     {
-        $errorResponse = $this->verifyRequest($request);
+        $errorResponse = $this->verifyRequest();
 
         if ($errorResponse > 0) {
             return new JsonResponse([], $errorResponse);

@@ -87,5 +87,7 @@ class ExportStdCommand extends ContainerAwareCommand
                 throw new \Exception("An error occured (code $returnCode)");
             }
         }
+
+        return 0;
     }
 }

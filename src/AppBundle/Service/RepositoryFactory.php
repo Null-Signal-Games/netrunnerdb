@@ -3,8 +3,10 @@
 namespace AppBundle\Service;
 
 use AppBundle\Entity\Cycle;
+use AppBundle\Entity\Mwl;
 use AppBundle\Entity\Pack;
 use AppBundle\Repository\CycleRepository;
+use AppBundle\Repository\MWLRepository;
 use AppBundle\Repository\PackRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -26,7 +28,7 @@ class RepositoryFactory
 
     /**
      * @param string $class
-     * @return \Doctrine\Common\Persistence\ObjectRepository
+     * @return \Doctrine\Persistence\ObjectRepository
      */
     public function getRepository(string $class)
     {
@@ -61,6 +63,20 @@ class RepositoryFactory
         $repository = $this->getRepository(Cycle::class);
 
         if ($repository instanceof CycleRepository) {
+            return $repository;
+        }
+
+        throw new \LogicException('Doctrine manager returned wrong repository.');
+    }
+
+    /**
+     * @return MWLRepository
+     */
+    public function getMwlRepository()
+    {
+        $repository = $this->getRepository(Mwl::class);
+
+        if ($repository instanceof MWLRepository) {
             return $repository;
         }
 

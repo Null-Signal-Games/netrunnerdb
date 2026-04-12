@@ -71,5 +71,7 @@ EOT
                 $client->getSecret()
             )
         );
+
+        return 0;
     }
 }

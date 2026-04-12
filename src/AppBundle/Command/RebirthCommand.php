@@ -46,7 +46,7 @@ class RebirthCommand extends ContainerAwareCommand
         $user = $userEntity->findOneBy(['username' => $username]);
         if (!($user instanceof User)) {
             $output->writeln('Could not find user ' . $username);
-            return;
+            return 1;
         }
 
         $output-> writeln('===== User ==============');
@@ -58,11 +58,13 @@ class RebirthCommand extends ContainerAwareCommand
 
         if (!strpos($user->getEmail(), "-was-a-damn-dirty-spammer")) {
             $output->writeln('User is already reborn.');
-            return;
+            return 1;
         }
 
         $user->setEmail(str_replace("-was-a-damn-dirty-spammer", "", $user->getEmail()));
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        return 0;
     }
 }

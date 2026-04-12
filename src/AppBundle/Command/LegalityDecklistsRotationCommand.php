@@ -80,5 +80,7 @@ class LegalityDecklistsRotationCommand extends ContainerAwareCommand
         $this->entityManager->flush();
 
         $output->writeln("<info>Done</info>");
+
+        return 0;
     }
 }

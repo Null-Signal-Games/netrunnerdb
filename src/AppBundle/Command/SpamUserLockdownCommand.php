@@ -60,11 +60,11 @@ class SpamUserLockdownCommand extends ContainerAwareCommand
         $user = $userEntity->findOneBy(['username' => $username]);
         if (!($user instanceof User)) {
             $output->writeln('Could not find user ' . $username);
-            return;
+            return 1;
         }
         if ($confirmation != "cerebral overwriter") {
             $output->writeln("The confirmation phrase was not properly provided.  Exiting.");
-            return;
+            return 1;
         }
 
         $output-> writeln('===== User ==============');
@@ -129,5 +129,7 @@ class SpamUserLockdownCommand extends ContainerAwareCommand
         $output->writeln("Recalculate decklist nbcomments fields");
         $update_decklist_nbcomments_sql = "UPDATE decklist d SET nbcomments = (SELECT COUNT(*) FROM comment c WHERE c.decklist_id = d.id)";
         $this->entityManager->getConnection()->executeQuery($update_decklist_nbcomments_sql);
+
+        return 0;
     }
 }

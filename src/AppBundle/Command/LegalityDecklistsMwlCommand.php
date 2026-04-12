@@ -44,5 +44,7 @@ class LegalityDecklistsMwlCommand extends ContainerAwareCommand
         $this->entityManager->getConnection()->executeQuery($sql);
 
         $output->writeln("<info>Done</info>");
+
+        return 0;
     }
 }

@@ -42,13 +42,13 @@ class LegalityActiveMwlCommand extends ContainerAwareCommand
 
         if (!count($list)) {
             $output->writeln("<error>No MWL in database</error>");
-            return;
+            return 1;
         }
 
         $mwl = array_shift($list);
         if ($mwl->getActive() || $mwl->getDateStart() > $now) {
             $output->writeln("Nothing to do");
-            return;
+            return 1;
         }
 
         $mwl->setActive(true);
@@ -62,5 +62,7 @@ class LegalityActiveMwlCommand extends ContainerAwareCommand
         }
 
         $this->entityManager->flush();
+
+        return 0;
     }
 }

@@ -50,6 +50,8 @@ class SuggestionsCommand extends ContainerAwareCommand
         $data = $this->getSuggestions($side);
         file_put_contents($this->publicDir . "/$side_code.json", json_encode($data));
         $output->writeln('done');
+
+        return 0;
     }
 
     private function addToMatrix(array &$matrix, array $cardIndexByTitle, string $card_1, string $card_2)
