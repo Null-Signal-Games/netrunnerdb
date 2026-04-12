@@ -8,5 +8,4 @@ phpstan:
 phpunit:
 	php vendor/bin/phpunit
 
-test:
-	vendor/bin/phpstan analyze src --level 7
+test: phpstan phpunit
