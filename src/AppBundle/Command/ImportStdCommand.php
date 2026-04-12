@@ -599,7 +599,9 @@ class ImportStdCommand extends ContainerAwareCommand
 
             $getter = 'get' . $foreignEntityShortName;
             if (!$entity->$getter() || $entity->$getter()->getId() !== $foreignEntity->getId()) {
-                $this->output->writeln("Changing the <info>$key</info> of <info>" . get_class($entity) . "</info>");
+                if (method_exists($entity, '__toString')) {
+                    $this->output->writeln("Changing the <info>$key</info> of <info>" . $entity . "</info>");
+                }
                 $setter = 'set' . $foreignEntityShortName;
                 $entity->$setter($foreignEntity);
             }
