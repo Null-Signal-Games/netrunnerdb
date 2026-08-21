@@ -142,5 +142,7 @@ class HighlightCommand extends ContainerAwareCommand
         $decklist_uuid = $input->getArgument('decklist_uuid');
         $result = $this->saveHighlight($decklist_uuid);
         $output->writeln(date('c') . " " . ($result ? "Success" : "Failure"));
+
+        return 0;
     }
 }

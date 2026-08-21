@@ -80,5 +80,7 @@ class CommentOnlyUserSummaryCommand extends ContainerAwareCommand
             $output->writeln("reviewcomment_days_active:      {$row['reviewcomment_days_active']}");
             $output->writeln("========================================================================");
         }
+
+        return 0;
     }
 }

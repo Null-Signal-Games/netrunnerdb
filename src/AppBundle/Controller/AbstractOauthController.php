@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\AccessToken;
 use AppBundle\Entity\Client;
 use FOS\OAuthServerBundle\Entity\AccessTokenManager;
 use JMS\Serializer\ArrayTransformerInterface;
@@ -41,12 +42,17 @@ abstract class AbstractOauthController extends Controller
      */
     public function getOauthClient(): Client
     {
-        return $this
+        $token = $this
             ->accessTokenManager
             ->findTokenBy([
                 'user' => $this->getUser(),
-            ])
-            ->getClient();
+            ]);
+
+        if (! $token instanceof AccessToken) {
+            throw new \LogicException('Expected ' . AccessToken::class . ', got ' . get_class($token));
+        }
+
+        return $token->getClient();
     }
 
     /**

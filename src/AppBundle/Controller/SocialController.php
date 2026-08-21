@@ -199,7 +199,7 @@ class SocialController extends Controller
     }
 
     /**
-     * @param int                    $deck_id
+     * @param int                    $decklist_id
      * @param EntityManagerInterface $entityManager
      * @return Response
      * @throws \Doctrine\DBAL\DBALException
@@ -518,7 +518,7 @@ class SocialController extends Controller
 
         // Bot prevention - this shouldn't ever happen unless a user messes with the comment input source
         if (!$user || !$user->isVerified()) {
-            return;
+            throw $this->createAccessDeniedException();
         }
 
         $decklist_uuid = $request->get('uuid');

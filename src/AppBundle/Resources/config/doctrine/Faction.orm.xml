@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity repository-class="AppBundle\Repository\FactionRepository" name="AppBundle\Entity\Faction" table="faction">
+    <indexes>
+      <index name="code_index" columns="code"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="code" type="string" column="code" length="255"/>
+    <field name="name" type="string" column="name" length="255"/>
+    <field name="color" type="string" column="color" length="6"/>
+    <field name="isMini" type="boolean" column="is_mini" nullable="true"/>
+    <field name="dateCreation" type="datetime" column="date_creation" nullable="false"/>
+    <field name="dateUpdate" type="datetime" column="date_update" nullable="false"/>
+    <one-to-many field="cards" target-entity="AppBundle\Entity\Card" mapped-by="faction" fetch="LAZY"/>
+    <one-to-many field="decklists" target-entity="AppBundle\Entity\Decklist" mapped-by="faction" fetch="LAZY"/>
+    <many-to-one field="side" target-entity="AppBundle\Entity\Side" inversed-by="factions" fetch="LAZY">
+      <join-columns>
+        <join-column name="side_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

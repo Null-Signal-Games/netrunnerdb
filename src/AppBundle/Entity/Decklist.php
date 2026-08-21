@@ -549,7 +549,7 @@ class Decklist implements NormalizableInterface, TimestampableInterface
     }
 
     /**
-     * @return Card[]
+     * @return array<string, array{'qty':int, 'card': Card}>
      */
     public function getCards()
     {

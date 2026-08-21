@@ -61,5 +61,7 @@ class ModerationLogCommand extends ContainerAwareCommand
         }
 
         $table->render();
+
+        return 0;
     }
 }

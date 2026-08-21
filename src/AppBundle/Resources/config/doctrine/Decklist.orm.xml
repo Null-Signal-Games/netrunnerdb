@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\Decklist" table="decklist">
+    <indexes>
+      <index name="date_creation_index" columns="date_creation"/>
+      <index name="rotation_index" columns="rotation_id"/>
+      <index name="moderation_status_index" columns="moderation_status"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="uuid" type="string" column="uuid" length="36" unique="true" nullable="true"/>
+    <field name="dateUpdate" type="datetime" column="date_update" nullable="false"/>
+    <field name="name" type="string" column="name" length="60"/>
+    <field name="prettyname" type="string" column="prettyname" length="60"/>
+    <field name="rawdescription" type="text" column="rawdescription" nullable="true"/>
+    <field name="description" type="text" column="description" nullable="true"/>
+    <field name="dateCreation" type="datetime" column="date_creation" nullable="false"/>
+    <field name="signature" type="string" column="signature" length="32"/>
+    <field name="nbvotes" type="integer" column="nbvotes"/>
+    <field name="nbfavorites" type="integer" column="nbfavorites"/>
+    <field name="nbcomments" type="integer" column="nbcomments"/>
+    <field name="dotw" type="integer" column="dotw"/>
+    <field name="moderationStatus" type="integer" column="moderation_status"/>
+    <field name="isLegal" type="boolean" column="is_legal"/>
+    <one-to-many field="slots" target-entity="AppBundle\Entity\Decklistslot" mapped-by="decklist" fetch="LAZY">
+      <cascade>
+        <cascade-remove/>
+        <cascade-persist/>
+        <cascade-detach/>
+      </cascade>
+    </one-to-many>
+    <one-to-many field="successors" target-entity="AppBundle\Entity\Decklist" mapped-by="precedent" fetch="LAZY"/>
+    <one-to-many field="children" target-entity="AppBundle\Entity\Deck" mapped-by="parent" fetch="LAZY"/>
+    <one-to-many field="legalities" target-entity="AppBundle\Entity\Legality" mapped-by="decklist" fetch="LAZY">
+      <cascade>
+        <cascade-remove/>
+      </cascade>
+    </one-to-many>
+    <one-to-many field="claims" target-entity="AppBundle\Entity\Claim" mapped-by="decklist" fetch="LAZY">
+      <cascade>
+        <cascade-remove/>
+      </cascade>
+    </one-to-many>
+    <one-to-many field="comments" target-entity="AppBundle\Entity\Comment" mapped-by="decklist" fetch="LAZY">
+      <cascade>
+        <cascade-remove/>
+        <cascade-persist/>
+        <cascade-detach/>
+      </cascade>
+    </one-to-many>
+    <many-to-one field="precedent" target-entity="AppBundle\Entity\Decklist" inversed-by="successors" fetch="LAZY">
+      <join-columns>
+        <join-column name="precedent_decklist_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="mwl" target-entity="AppBundle\Entity\Mwl" fetch="LAZY">
+      <join-columns>
+        <join-column name="mwl_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="rotation" target-entity="AppBundle\Entity\Rotation" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="rotation_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="modflag" target-entity="AppBundle\Entity\Modflag" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="modflag_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="tournament" target-entity="AppBundle\Entity\Tournament" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="tournament_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="faction" target-entity="AppBundle\Entity\Faction" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="faction_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="parent" target-entity="AppBundle\Entity\Deck" inversed-by="children" fetch="LAZY">
+      <join-columns>
+        <join-column name="parent_deck_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="lastPack" target-entity="AppBundle\Entity\Pack" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="last_pack_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="identity" target-entity="AppBundle\Entity\Card" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="identity_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="side" target-entity="AppBundle\Entity\Side" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="side_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="user" target-entity="AppBundle\Entity\User" inversed-by="decklists" fetch="LAZY">
+      <join-columns>
+        <join-column name="user_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-many field="favorites" target-entity="AppBundle\Entity\User" inversed-by="favorites" fetch="EXTRA_LAZY">
+      <cascade>
+        <cascade-persist/>
+      </cascade>
+      <join-table name="favorite">
+        <join-columns>
+          <join-column name="decklist_id" referenced-column-name="id"/>
+        </join-columns>
+        <inverse-join-columns>
+          <join-column name="user_id" referenced-column-name="id"/>
+        </inverse-join-columns>
+      </join-table>
+    </many-to-many>
+    <many-to-many field="votes" target-entity="AppBundle\Entity\User" inversed-by="votes" fetch="EXTRA_LAZY">
+      <cascade>
+        <cascade-persist/>
+      </cascade>
+      <join-table name="vote">
+        <join-columns>
+          <join-column name="decklist_id" referenced-column-name="id"/>
+        </join-columns>
+        <inverse-join-columns>
+          <join-column name="user_id" referenced-column-name="id"/>
+        </inverse-join-columns>
+      </join-table>
+    </many-to-many>
+  </entity>
+</doctrine-mapping>
