@@ -404,12 +404,6 @@ a:focus {
   vertical-align: text-bottom
 }
 
-.icon-fw {
-  width: 20px;
-  display: inline-block;
-  text-align: center;
-}
-
 .influence {
   font-size: 90%;
   font-family: Arial;
@@ -1471,7 +1465,7 @@ div.ad-blocked {
   position: relative;
 }
 
-.navbar-brand span.icon:nth-child(2) {
+.navbar-brand svg.icon:nth-child(2) {
   position: absolute;
   left: 15px;
 }
@@ -1491,8 +1485,8 @@ div.ad-blocked {
 }
 
 .navbar-brand .icon {
-  font-size: 120%;
-  line-height: 83%;
+    font-size: 120%;
+    baseline-shift: 5px;
 }
 
 .navbar-brand:hover .icon-link-half-top {
@@ -1711,6 +1705,28 @@ ul.rulings-list blockquote {
 
 .legality-3-inf.legality-interactive:not(:hover):not(:active):before {
   content: "3";
+}
+
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+  vertical-align: middle;
+}
+
+.icon-credit {
+  margin-inline-start: -0.12em;
+}
+
+.icon-subroutine {
+  vertical-align: baseline;
+}
+
+.icon-fw {
+  width: 20px;
 }
 
 /*** screen reader fallback ***/
@@ -2274,15 +2290,6 @@ table .table-cell {
 
 .table > tbody > tr > td[data-th="Faction"] {
   vertical-align: revert; !important;
-}
-
-/*  Select all icon types under .card-text */
-.card-text abbr[class*="icon icon-"] {
-  font-size: 0px;
-}
-
-.card-text abbr[class*="icon icon-"]:before {
-  font-size: 16px;
 }
 
 .card-image-flippable {

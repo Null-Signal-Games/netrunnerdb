@@ -471,7 +471,7 @@ $(function() {
       return value;
     },
     replace : function(value) {
-      return '<span class="icon icon-' + value + '"></span>';
+      return NRDB.format.icon(value, {fallback: value});
     },
     index : 1
   }]);

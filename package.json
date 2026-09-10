@@ -1,0 +1,12 @@
+{
+  "name": "netrunnerdb",
+  "version": "1.7.6",
+  "description": "Deckbuilder for Netrunner card game",
+  "scripts": {
+    "svg-sprite": "svg-sprite -C svg-sprite.config.json web/images/icons/*.svg"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "svg-sprite": "^2.0.4"
+  }
+}

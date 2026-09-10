@@ -187,7 +187,7 @@
                 <tr>
                     <td>
                         <a href="${Routing.generate('cards_zoom', {_locale: NRDB.locale, 'card_code': printing_id})}">
-                            <span class="icon icon-${cardCycleIdToLegacyCode[cardSetIdToCycleId[printingIdToCardSetId[printing_id]]]}"></span> ${cardSetIdToName[printingIdToCardSetId[printing_id]]}
+                            ${NRDB.format.icon(cardCycleIdToLegacyCode[cardSetIdToCycleId[printingIdToCardSetId[printing_id]]])} ${cardSetIdToName[printingIdToCardSetId[printing_id]]}
                         </a>
                     </td>
                 </tr>
@@ -228,7 +228,7 @@
                     </span>
                     <span class="card-cost">
                         {% if card.type_code == "agenda" %}
-                            {{ card.advancementcost }}/{{ card.agendapoints }}<span class="icon icon-agenda-points"></span>
+                            {{ card.advancementcost }}/{{ card.agendapoints }}{{ icon('agenda-points') }}
                         {% endif %}
                         {% if card.type_code != "identity" and card.type_code != "agenda" %}
                             <abbr title="{{ card.cost }} Credit{{ card.cost != 1 ? 's' : '' }}">{{ card.formatted_cost|raw }}</abbr>
@@ -322,7 +322,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    <span class="icon icon-{{ card.cycle_code }}"></span> {{ card.pack_name}} ({{ card.pack_code }})
+                    {{ icon(card.cycle_code) }} {{ card.pack_name}} ({{ card.pack_code }})
                 </h3>
                 #{{ card.position }} &bull;
                 <a href="{{ path('cards_zoom',{_locale:app.request.locale, 'card_code':card.code}) }}"> English </a>

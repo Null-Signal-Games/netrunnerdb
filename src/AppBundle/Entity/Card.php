@@ -1138,6 +1138,6 @@ class Card implements NormalizableInterface, TimestampableInterface
         if (is_null($cost) && !($this->getType()->getName() == "Identity" || $this->getType()->getName() == "Agenda")) {
             $cost = 'X';
         }
-        return $cost . "<span class=\"icon icon-credit\" aria-hidden=\"true\"></span><span class=\"icon-fallback\">[credit]</span>";
+        return $cost . "<svg class=\"icon icon-credit\" aria-hidden=\"true\"><use xlink:href=\"/images/netrunner.svg#icon-credit\"></use></svg><span class=\"icon-fallback\">[credit]</span>";
     }
 }

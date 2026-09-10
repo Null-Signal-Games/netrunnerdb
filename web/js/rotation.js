@@ -157,7 +157,7 @@ Promise.all([NRDB.data.promise]).then(function() {
       $('#diffs').append(
         $('<div style="display:' + (visible ? 'block' : 'none') + '" data-title="' + card.title.replaceAll('"', '') + '" data-faction="' + card.faction.code + '" data-type="' + card.type.code + '">' +
             '<span class="legality-' + card['diff'] + '"></span> ' +
-            '<span class="icon icon-' + card.faction.code + ' influence-' + card.faction.code + '"></span>' +
+            NRDB.format.icon(card.faction.code, {className: 'influence-' + card.faction.code}) +
             ' <svg class="typeIcon" aria-label="'+card.type.code+'"><use xlink:href="/images/icons.svg#type-'+card.type.code+'"></use></svg>' +
             ' <a href="' + Routing.generate('cards_zoom', {card_code:card.code}) + '">' + card.title + '</a></div>')
       );

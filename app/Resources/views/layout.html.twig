@@ -24,8 +24,8 @@
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
     <link rel="stylesheet" href="{{ asset('/css/style.css') }}?cachebuster={{ asset_fingerprint }}">
     <link rel="stylesheet" href="{{ asset('/latofonts.css') }}?cachebuster={{ asset_fingerprint }}">
-    <link rel="stylesheet" href="{{ asset('/netrunnerfont.css') }}?cachebuster={{ asset_fingerprint }}">
     <link rel="preload" href="/images/icons.svg?cachebuster={{ asset_fingerprint }}" as="image" type="image/svg+xml">
+    <link rel="preload" href="/images/netrunner.svg?cachebuster={{ asset_fingerprint }}" as="image" type="image/svg+xml">
 
     {# Set the light/dark theme asap to reduce FOUC #}
     <script type="text/javascript">
@@ -126,8 +126,8 @@
               <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="{{ path('netrunnerdb_index') }}">
-              <span class="icon icon-link-half-top"></span>
-              <span class="icon icon-link-half-bottom"></span>
+              {{ icon('link-half-top') }}
+              {{ icon('link-half-bottom') }}
               NetrunnerDB
             </a>
           </div>

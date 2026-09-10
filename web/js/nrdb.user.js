@@ -63,7 +63,7 @@
 
         if($('ins.adsbygoogle').filter(':visible').length === 0) {
             $('div.ad').each(function (index, element) {
-                $(element).addClass('ad-blocked').html("No ad,<br>no <span class=\"icon icon-credit\"></span>.<br>Like NRDB?<br>Whitelist us<br>or <a href=\"" + Routing.generate('donators') + "\">donate</a>.");
+                $(element).addClass('ad-blocked').html("No ad,<br>no " + NRDB.format.icon('credit') + ".<br>Like NRDB?<br>Whitelist us<br>or <a href=\"" + Routing.generate('donators') + "\">donate</a>.");
             });
         }
     };

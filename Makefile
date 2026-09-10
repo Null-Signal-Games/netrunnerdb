@@ -7,3 +7,6 @@ phpstan:
 
 test:
 	vendor/bin/phpstan analyze src --level 7
+
+web/netrunner.svg:
+	npm run svg-sprite

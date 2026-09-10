@@ -197,7 +197,7 @@ NRDB.user.params.decklist_id = Decklist.id;
 {% if claims|length %}
 <table class="table table-condensed" id="table-claims">
 <thead>
-<tr><th colspan="3"><span class="netrunner icon icon-abr"></span> Tournaments</th></tr>
+<tr><th colspan="3">{{ icon('abr', 'netrunner') }} Tournaments</th></tr>
 </thead>
 <tbody>
 {% for claim in claims %}
@@ -229,7 +229,7 @@ NRDB.user.params.decklist_id = Decklist.id;
 {% for pack in packs %}
 <tr>
     <td>
-      <span class="small icon icon-fw icon-{{ pack.cycle_code }}" title="{{ pack.cycle_name }}"></span> <a href="{{ path('cards_list',{pack_code:pack.code}) }}">{{ pack.name }}</a>
+      {{ icon(pack.cycle_code, 'small icon-fw', pack.cycle_name) }} <a href="{{ path('cards_list',{pack_code:pack.code}) }}">{{ pack.name }}</a>
     </td>
 </tr>
 {% endfor %}
