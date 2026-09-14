@@ -1714,15 +1714,23 @@ ul.rulings-list blockquote {
   stroke-width: 0;
   stroke: currentColor;
   fill: currentColor;
-  vertical-align: middle;
+}
+
+.icon-click,
+.icon-credit,
+.icon-interrupt,
+.icon-link,
+.icon-mu,
+.icon-neutral-corp,
+.icon-neutral-runner,
+.icon-recurring-credit,
+.icon-trash
+{
+  vertical-align: -0.125em;
 }
 
 .icon-credit {
-  margin-inline-start: -0.12em;
-}
-
-.icon-subroutine {
-  vertical-align: baseline;
+  margin-inline: -0.15em;
 }
 
 .icon-fw {
