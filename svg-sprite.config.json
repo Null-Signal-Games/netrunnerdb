@@ -11,7 +11,26 @@
     "spacing": {
       "padding": 0,
       "box": "content"
-    }
+    },
+    "transform": [
+      {
+        "svgo": {
+            "plugins": [
+                "preset-default",
+                "convertStyleToAttrs",
+                {
+                    "name": "removeAttrs",
+                    "params": {
+                        "attrs": [
+                            "*:fill:(?!none$)(?!currentColor$).*",
+                            "*:stroke:(?!none$)(?!currentColor$).*"
+                        ]
+                    }
+                }
+            ]
+        }
+      }
+    ]
   },
 
   "mode": {
