@@ -133,9 +133,6 @@ Promise.all([NRDB.data.promise, NRDB.settings.promise]).then(function() {
     $('#filter-text').parent().find('.tt-selectable:first').addClass('tt-cursor');
   });
 
-  make_cost_graph();
-  make_strength_graph();
-
   $.each(History, function (index, snapshot) {
     add_snapshot(snapshot);
   });
@@ -181,6 +178,8 @@ Promise.all([NRDB.data.promise, NRDB.settings.promise]).then(function() {
     create_collection_tab(initialPackSelection);
   });
 
+  make_cost_graph();
+  make_strength_graph();
 });
 
 // This will filter matchingCards to only the latest version of each card, preserving the original order of matchingCards.
