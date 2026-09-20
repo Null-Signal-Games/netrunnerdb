@@ -73,7 +73,7 @@
         <tr>
           <th>Title</th>
           <th>Faction</th>
-          <th title="Cost"><span class="icon icon-credit"></span></th>
+          <th title="Cost">{{ icon('credit') }}</th>
           <th>Type</th>
           <th title="Strength/Agenda Points/Trash Cost">…</th>
           <th>Subtype</th>
@@ -378,7 +378,7 @@ function populateResults() {
         <td data-th="Influence">
                     <span class="influence-${card.attributes.faction_id.replaceAll('_', '-')}" aria-label="${influence} Influence">${'●'.repeat(influence)}&nbsp;</span>
                 </td>
-        <td data-th="Set"><span class="icon icon-${card.attributes.card_cycle_id.replaceAll('_', '-')}"></span> ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position}</td>
+        <td data-th="Set">${NRDB.format.icon(card.attributes.card_cycle_id.replaceAll('_', '-'))} ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position}</td>
       </tr>`;
     $('#card_results_table_body').append(rowContents);
 
@@ -433,7 +433,7 @@ function populateResults() {
         </p>
         <p style="font-size:86.5%">${illustratorText}</p>
         <p>
-          <span class="icon icon-${card.attributes.card_cycle_id.replaceAll('_', '-')}"></span> ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position} • ${factionMap.get(card.attributes.faction_id).attributes.name}
+          ${NRDB.format.icon(card.attributes.card_cycle_id.replaceAll('_', '-'))} ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position} • ${factionMap.get(card.attributes.faction_id).attributes.name}
         </p>
       </div>
     `);
@@ -480,7 +480,7 @@ function populateResults() {
                 <small>
                 ${factionMap.get(card.attributes.faction_id).attributes.name} •
                 ${illustratorText} •
-                <span class="icon icon-${card.attributes.card_cycle_id.replaceAll('_', '-')}"></span>
+                ${NRDB.format.icon(card.attributes.card_cycle_id.replaceAll('_', '-'))}
                 ${cardSetMap.get(card.attributes.card_set_id).attributes.name} ${card.attributes.position}
                 </small>
               </div>

@@ -163,7 +163,7 @@ function setup_comment_form() {
                 return value;
             },
             replace: function (value) {
-                return '<span class="icon icon-' + value + '"></span>';
+                return NRDB.format.icon(value, {fallback: value});
             },
             index: 1
         }]);
@@ -428,7 +428,7 @@ function edit_form() {
       return value;
     },
     replace : function(value) {
-      return '<span class="icon icon-' + value + '"></span>';
+      return NRDB.format.icon(value, {fallback: value});
     },
     index : 1
   }]);

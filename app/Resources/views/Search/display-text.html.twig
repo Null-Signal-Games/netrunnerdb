@@ -40,7 +40,7 @@
     {% endfor %}
   </p>
   <p>
-    <span class="icon icon-{{ card.cycle_code }}"></span> {{ card.pack_name }} {{ card.position }} &bull; {{ card.faction_name }}
+    {{ icon(card.cycle_code) }} {{ card.pack_name }} {{ card.position }} &bull; {{ card.faction_name }}
   </p>
 </div>
 {% endif %}

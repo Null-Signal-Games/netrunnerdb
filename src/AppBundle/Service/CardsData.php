@@ -96,24 +96,29 @@ class CardsData
      */
     public function replaceSymbols(string $text)
     {
-        $map = [
-            '[subroutine]'         => '<abbr class="icon icon-subroutine" title="Subroutine">[subroutine]</abbr>',
-            '[credit]'             => '<abbr class="icon icon-credit" title="Credit">[credit]</abbr>',
-            '[trash]'              => '<abbr class="icon icon-trash" title="Trash">[trash]</abbr>',
-            '[click]'              => '<abbr class="icon icon-click" title="Click">[click]</abbr>',
-            '[recurring-credit]'   => '<abbr class="icon icon-recurring-credit title="Recurring credit">[recurring credit]</abbr>',
-            '[mu]'                 => '<abbr class="icon icon-mu" title="Memory unit">[memory unit]</abbr>',
-            '[link]'               => '<abbr class="icon icon-link" title="Link">[link]</abbr>',
-            '[anarch]'             => '<abbr class="icon icon-anarch" title="Anarch">[anarch]</abbr>',
-            '[criminal]'           => '<abbr class="icon icon-criminal" title="Criminal">[criminal]</abbr>',
-            '[shaper]'             => '<abbr class="icon icon-shaper" title="Shaper">[shaper]</abbr>',
-            '[jinteki]'            => '<abbr class="icon icon-jinteki" title="Jinteki">[jinteki]</abbr>',
-            '[haas-bioroid]'       => '<abbr class="icon icon-haas-btitle="Haas-bioroid">[haas bioroid]</abbr>',
-            '[nbn]'                => '<abbr class="icon icon-nbn" title="NBN">[nbn]</abbr>',
-            '[weyland-consortium]' => '<abbr class="icon icon-weyland-consortium" title="Weyland Consortium">[weyland consortium]</abbr>',
-            '[interrupt]'          => '<abbr class="icon icon-interrupt" title="Interrupt">[interrupt]</abbr>',
+        $icons = [
+            [ "anarch", "Anarch"],
+            [ "click", "Click"],
+            [ "credit", "Credit"],
+            [ "criminal", "Criminal"],
+            [ "haas-bioroid", "Haas Bioroid"],
+            [ "interrupt", "Interrupt"],
+            [ "jinteki", "Jinteki"],
+            [ "link", "Link"],
+            [ "mu", "Memory unit"],
+            [ "nbn", "NBN"],
+            [ "recurring-credit", "Recurring credit"],
+            [ "shaper", "Shaper"],
+            [ "subroutine", "Subroutine"],
+            [ "trash", "Trash"],
+            [ "weyland-consortium", "Weyland Consortium"],
         ];
 
+        $format = '<svg class="icon icon-%1$s" aria-hidden="true"><use xlink:href="/images/netrunner.svg#icon-%1$s"></use></svg><span class="icon-fallback">%2$s</span>';
+        $map = [];
+        foreach ($icons as $icon) {
+            $map["[".$icon[0]. "]"] = sprintf($format, $icon[0], $icon[1]);
+        }
         return str_replace(array_keys($map), array_values($map), $text);
     }
 

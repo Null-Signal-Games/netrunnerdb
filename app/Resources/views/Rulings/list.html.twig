@@ -10,14 +10,14 @@
                 <ul>
                     {% for card in list %}
                         {% if not card.rulings is empty %}
-                            <li><a href="#{{ card.code }}">{{ card.title }} <span class="icon icon-{{ card.pack.cycle.code }}"></span> {{card.position}}</a></li>
+                            <li><a href="#{{ card.code }}">{{ card.title }} {{ icon(card.pack.cycle.code) }} {{card.position}}</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </nav>
             {% for card in list %}
                 {% if not card.rulings is empty %}
-                    <h4><a id="{{ card.code }}" href="{{ path('cards_zoom', {card_code: card.code}) }}">{{ card.title }}</a> (<span class="icon icon-{{ card.pack.cycle.code }}"></span> {{ card.pack.name }}, {{card.position}})</h4>
+                    <h4><a id="{{ card.code }}" href="{{ path('cards_zoom', {card_code: card.code}) }}">{{ card.title }}</a> ({{ icon(card.pack.cycle.code) }} {{ card.pack.name }}, {{card.position}})</h4>
                     <ul class="rulings-list">
                         {% for ruling in card.rulings %}
                             <li class="{% if ruling.nsgRulesTeamVerified %}legality-verified{% else %}legality-unverified{% endif %}">

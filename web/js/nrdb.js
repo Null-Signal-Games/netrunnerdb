@@ -356,7 +356,7 @@ function update_deck(options) {
             if (row.image) {
                 item = $(`<h5><svg class="typeIcon" aria-label="${row.label}"><use xlink:href="${row.image}"></use></svg>${row.label} (<span></span>)</h5>`).hide();
             } else if (DisplaySort == "faction") {
-                $('<span class="icon icon-' + row.id + ' ' + row.id + '"></span>').prependTo(item);
+                $(NRDB.format.icon(row.id, {className: row.id})).prependTo(item);
             }
             var content = $('<div class="deck-' + row.id + '"></div>');
             div.append(item).append(content);
@@ -468,7 +468,7 @@ function update_deck(options) {
         if (DisplaySort === 'number' || DisplaySortSecondary === 'number') {
             var number_of_sets = Math.ceil(card.indeck / card.quantity);
             var alert_number_of_sets = number_of_sets > 1 ? '<small class="text-warning">' + number_of_sets + ' sets needed</small> ' : '';
-            additional_info = '(<span class="small icon icon-' + card.pack.cycle.code + '"></span> ' + card.position + ') ' + alert_number_of_sets + influence;
+            additional_info = '(' + NRDB.format.icon(card.pack.cycle.code, {className: 'small'}) + ' ' + card.position + ') ' + alert_number_of_sets + influence;
         }
 
         var item = $('<div>' + card.indeck + 'x <a href="' + Routing.generate('cards_zoom', { card_code: card.code }) + '" class="card" data-toggle="modal" data-remote="false" data-target="#cardModal" data-index="' + card.code + '">' + card.title + '</a>' + additional_info + get_card_legality_icons(card) + '</div>');

@@ -77,7 +77,7 @@ function add_ruling(event) {
                 return value;
             },
             replace: function (value) {
-                return '<span class="icon icon-' + value + '"></span>';
+                return NRDB.format.icon(value, {fallback: value});
             },
             index: 1
         }]);
@@ -141,7 +141,7 @@ function edit_ruling(event) {
                 return value;
             },
             replace: function (value) {
-                return '<span class="icon icon-' + value + '"></span>';
+                return NRDB.format.icon(value, {fallback: value});
             },
             index: 1
         }]);
@@ -211,7 +211,7 @@ function write_comment(event) {
                 return value;
             },
             replace: function (value) {
-                return '<span class="icon icon-' + value + '"></span>';
+                return NRDB.format.icon(value, {fallback: value});
             },
             index: 1
         }]);
@@ -354,7 +354,7 @@ function write_review_open(event) {
                 return value;
             },
             replace: function (value) {
-                return '<span class="icon icon-' + value + '"></span>';
+                return NRDB.format.icon(value, {fallback: value});
             },
             index: 1
         }]);

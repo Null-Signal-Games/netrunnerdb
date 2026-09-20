@@ -28,7 +28,7 @@ $(document).on('data.app', function() {
 <div class="row">
     <div class="col-xs-12 panel-group">
         <h1 class="prebuilt-name">
-            <span class="hidden-xs icon icon-{{ prebuilt.faction_code }} {{ prebuilt.faction_code }}"></span>
+            {{ icon(prebuilt.faction_code, 'hidden-xs ' ~ prebuilt.faction_code) }}
             {{ prebuilt.name }}
         </h1>
     </div>

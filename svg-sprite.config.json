@@ -1,0 +1,52 @@
+{
+  "shape": {
+    "id": {
+      "separator": "-",
+      "generator": "icon-%s"
+    },
+    "dimension": {
+      "maxWidth": 1024,
+      "maxHeight": 1024
+    },
+    "spacing": {
+      "padding": 0,
+      "box": "content"
+    },
+    "transform": [
+      {
+        "svgo": {
+            "plugins": [
+                "preset-default",
+                "convertStyleToAttrs",
+                {
+                    "name": "removeAttrs",
+                    "params": {
+                        "attrs": [
+                            "*:fill:(?!none$)(?!currentColor$).*",
+                            "*:stroke:(?!none$)(?!currentColor$).*"
+                        ]
+                    }
+                }
+            ]
+        }
+      }
+    ]
+  },
+
+  "mode": {
+    "symbol": {
+      "dest": "web/images",
+      "sprite": "netrunner.svg",
+      "prefix": ".icon-",
+      "bust": false
+    }
+  },
+
+  "svg": {
+    "xmlDeclaration": false,
+    "rootAttributes": {
+      "aria-hidden": "true",
+      "focusable": "false"
+    }
+  }
+}

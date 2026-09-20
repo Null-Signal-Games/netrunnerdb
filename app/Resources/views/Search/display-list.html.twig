@@ -7,7 +7,7 @@
       <tr>
          <th>Title</th>
          <th>Faction</th>
-         <th title="Cost"><span class="icon icon-credit"></span></th>
+         <th title="Cost">{{ icon('credit') }}</th>
          <th>Type</th>
          <th title="Strength/Agenda Points/Trash Cost">&hellip;</th>
          <th>Subtype</th>
@@ -37,7 +37,7 @@
          </span>
          {% endif %}
       </td>
-      <td data-th="Set"><span class="icon icon-{{ card.cycle_code }}"></span> {{ card.pack_name }} {{ card.position }}</td>
+      <td data-th="Set">{{ icon(card.cycle_code) }} {{ card.pack_name }} {{ card.position }}</td>
    </tr>
    {% endfor %}
 </table>

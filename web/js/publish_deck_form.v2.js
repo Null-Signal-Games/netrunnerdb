@@ -41,7 +41,7 @@ function initialize_publish_deck_form_typeahead() {
       return value;
     },
     replace : function(value) {
-      return '<span class="icon icon-' + value + '"></span>';
+      return NRDB.format.icon(value, {fallback: value});
     },
     index : 1
   }]);
