@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity repository-class="AppBundle\Repository\CardRepository" name="AppBundle\Entity\Card" table="card">
+    <indexes>
+      <index name="title_index" columns="title"/>
+      <index name="cost_index" columns="cost"/>
+      <index name="advancement_cost_index" columns="advancement_cost"/>
+      <index name="strength_index" columns="strength"/>
+      <index name="agenda_points_index" columns="agenda_points"/>
+      <index name="trash_cost_index" columns="trash_cost"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="dateUpdate" type="datetime" column="date_update" nullable="false"/>
+    <field name="dateCreation" type="datetime" column="date_creation" nullable="false"/>
+    <field name="code" type="string" column="code" length="5" unique="true"/>
+    <field name="title" type="string" column="title" length="255"/>
+    <field name="strippedTitle" type="string" column="stripped_title" length="1024" nullable="true"/>
+    <field name="keywords" type="string" column="keywords" length="255" nullable="true"/>
+    <field name="text" type="string" column="text" length="1024" nullable="true"/>
+    <field name="strippedText" type="string" column="stripped_text" length="1024" nullable="true"/>
+    <field name="advancementCost" type="smallint" column="advancement_cost" nullable="true"/>
+    <field name="agendaPoints" type="smallint" column="agenda_points" nullable="true"/>
+    <field name="baseLink" type="smallint" column="base_link" nullable="true"/>
+    <field name="cost" type="smallint" column="cost" nullable="true"/>
+    <field name="factionCost" type="smallint" column="faction_cost" nullable="true"/>
+    <field name="flavor" type="string" column="flavor" length="1024" nullable="true"/>
+    <field name="illustrator" type="string" column="illustrator" length="255" nullable="true"/>
+    <field name="influenceLimit" type="smallint" column="influence_limit" nullable="true"/>
+    <field name="memoryCost" type="smallint" column="memory_cost" nullable="true"/>
+    <field name="minimumDeckSize" type="smallint" column="minimum_deck_size" nullable="true"/>
+    <field name="position" type="smallint" column="position" nullable="false"/>
+    <field name="quantity" type="smallint" column="quantity" nullable="false"/>
+    <field name="strength" type="smallint" column="strength" nullable="true"/>
+    <field name="trashCost" type="smallint" column="trash_cost" nullable="true"/>
+    <field name="uniqueness" type="boolean" column="uniqueness" nullable="false"/>
+    <field name="deckLimit" type="smallint" column="deck_limit" nullable="false"/>
+    <field name="imageUrl" type="string" column="image_url" nullable="true"/>
+    <one-to-many field="decklists" target-entity="AppBundle\Entity\Decklist" mapped-by="identity" fetch="LAZY">
+      <order-by>
+        <order-by-field name="dateCreation" direction="DESC"/>
+      </order-by>
+    </one-to-many>
+    <one-to-many field="reviews" target-entity="AppBundle\Entity\Review" mapped-by="card" fetch="LAZY">
+      <order-by>
+        <order-by-field name="dateCreation" direction="DESC"/>
+      </order-by>
+    </one-to-many>
+    <one-to-many field="rulings" target-entity="AppBundle\Entity\Ruling" mapped-by="card" fetch="LAZY">
+      <order-by>
+        <order-by-field name="dateCreation" direction="DESC"/>
+      </order-by>
+    </one-to-many>
+    <many-to-one field="pack" target-entity="AppBundle\Entity\Pack" inversed-by="cards" fetch="LAZY">
+      <join-columns>
+        <join-column name="pack_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="type" target-entity="AppBundle\Entity\Type" inversed-by="cards" fetch="LAZY">
+      <join-columns>
+        <join-column name="type_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="faction" target-entity="AppBundle\Entity\Faction" inversed-by="cards" fetch="LAZY">
+      <join-columns>
+        <join-column name="faction_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="side" target-entity="AppBundle\Entity\Side" inversed-by="cards" fetch="LAZY">
+      <join-columns>
+        <join-column name="side_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

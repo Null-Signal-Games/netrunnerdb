@@ -183,8 +183,8 @@ class MwlCard implements NormalizableInterface
     {
         return [
             'id'                     => $this->id,
-            'mwl_id'                 => $this->mwl->id,
-            'card_id'                => $this->card->id,
+            'mwl_id'                 => $this->mwl->getId(),
+            'card_id'                => $this->card->getId(),
             'global_penalty'         => $this->global_penalty,
             'universal_faction_cost' => $this->universal_faction_cost,
             'is_restricted'          => $this->is_restricted,

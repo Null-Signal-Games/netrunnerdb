@@ -81,7 +81,7 @@ class PublicApi20Controller extends AbstractFOSRestController
 
     private function getDateUpdateFromEntities(array $entities) {
       return array_reduce($entities, function ($carry, TimestampableInterface $item) {
-        if (!$carry || ($item->getDateUpdate() > $carry)) {
+        if (!($carry instanceof \DateTimeInterface) || ($item->getDateUpdate() > $carry)) {
           return $item->getDateUpdate();
         } else {
           return $carry;
@@ -134,7 +134,7 @@ class PublicApi20Controller extends AbstractFOSRestController
       $response->setMaxAge($this->shortCache);
 
       $dateUpdate = array_reduce($entities, function ($carry, TimestampableInterface $item) {
-        if (!$carry || ($item->getDateUpdate() > $carry)) {
+        if (!($carry instanceof \DateTimeInterface ) || ($item->getDateUpdate() > $carry)) {
           return $item->getDateUpdate();
         } else {
           return $carry;

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\Claim" table="claim">
+    <unique-constraints>
+      <unique-constraint name="usercard_index" columns="decklist_id,client_id,name,rank"/>
+    </unique-constraints>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="name" type="string" column="name" length="255"/>
+    <field name="url" type="string" column="url" length="255"/>
+    <field name="rank" type="smallint" column="rank"/>
+    <field name="participants" type="smallint" column="participants"/>
+    <many-to-one field="decklist" target-entity="AppBundle\Entity\Decklist" inversed-by="claims" fetch="LAZY">
+      <join-columns>
+        <join-column name="decklist_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="client" target-entity="AppBundle\Entity\Client" inversed-by="claims" fetch="LAZY">
+      <join-columns>
+        <join-column name="client_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="user" target-entity="AppBundle\Entity\User" fetch="LAZY">
+      <join-columns>
+        <join-column name="user_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

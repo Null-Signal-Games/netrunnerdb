@@ -45,6 +45,8 @@ class CommentizeCommand extends ContainerAwareCommand
         $review_dest_id = $input->getArgument('review_dest_id');
         $error = $this->review_to_comment($review_orig_id, $review_dest_id);
         $output->writeln(date('c') . " " . (empty($error) ? "Success" : $error));
+
+        return 0;
     }
 
     private function review_to_comment(int $review_orig_id, int $review_dest_id)

@@ -46,7 +46,7 @@ class DonatorCommand extends ContainerAwareCommand
     {
         $email = $input->getArgument('email');
         $type = $input->getArgument('type');
-        $amount = $input->getArgument('amount');
+        $amount = intval($input->getArgument('amount'));
 
         $repo = $this->entityManager->getRepository('AppBundle:User');
         /** @var User $user */
@@ -70,5 +70,7 @@ class DonatorCommand extends ContainerAwareCommand
         } else {
             $output->writeln(date('c') . " " . "Invalid donation type [$type]: expected 'patreon' or 'paypal'");
         }
+
+        return 0;
     }
 }

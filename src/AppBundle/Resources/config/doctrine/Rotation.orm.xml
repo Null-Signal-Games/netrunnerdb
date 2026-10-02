@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\Rotation" table="rotation">
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="code" type="string" column="code" length="255"/>
+    <field name="name" type="string" column="name" length="255"/>
+    <field name="dateCreation" type="datetime" column="date_creation"/>
+    <field name="dateUpdate" type="datetime" column="date_update"/>
+    <field name="dateStart" type="date" column="date_start" nullable="true"/>
+    <one-to-many field="decklists" target-entity="AppBundle\Entity\Decklist" mapped-by="rotation" fetch="LAZY"/>
+    <many-to-many field="rotated" target-entity="AppBundle\Entity\Cycle" inversed-by="rotations" fetch="LAZY">
+      <cascade>
+        <cascade-persist/>
+      </cascade>
+      <join-table name="rotation_cycle">
+        <join-columns>
+          <join-column name="rotation_id" referenced-column-name="id"/>
+        </join-columns>
+        <inverse-join-columns>
+          <join-column name="cycle_id" referenced-column-name="id"/>
+        </inverse-join-columns>
+      </join-table>
+    </many-to-many>
+  </entity>
+</doctrine-mapping>

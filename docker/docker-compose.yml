@@ -34,5 +34,40 @@ services:
       MYSQL_USER: nrdb-dev
       MYSQL_PASSWORD: passwd
 
+  nrdb-test:
+    environment:
+      SYMFONY_ENV: test
+    container_name: nrdb-test
+    build: .
+    depends_on:
+      - nrdb-test-db
+    links:
+      - nrdb-test-db
+    volumes:
+      # Link up the nrdb source code and card database.
+      - ./netrunnerdb:/var/www/html/nrdb
+      - ./netrunner-cards-json:/var/www/html/nrdb/cards
+      # redirect everything to app_dev.php rather than app.php
+      - ./.htaccess:/var/www/html/nrdb/web/.htaccess
+      # overwrite default app_dev.php with one that has the "does this
+      # look like a dev setup?" security check commented out.
+      - ./app_dev.php:/var/www/html/nrdb/web/app_dev.php
+      # define our app/config/parameters.yml with dev settings
+      - ./test-parameters.yml:/var/www/html/nrdb/app/config/parameters.yml
+
+  nrdb-test-db:
+    container_name: nrdb-test-db
+    image: "mysql:8"
+    restart: always
+    tmpfs:
+      - /var/lib/mysql
+    volumes:
+      - ./netrunnerdb/tests/fixtures/mysqldump:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: passwd
+      MYSQL_DATABASE: nrdb-test
+      MYSQL_USER: nrdb-test
+      MYSQL_PASSWORD: passwd
+
 volumes:
   dbdata:

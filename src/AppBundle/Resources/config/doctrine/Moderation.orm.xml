@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\Moderation" table="moderation">
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="dateCreation" type="datetime" column="date_creation" nullable="false"/>
+    <field name="statusBefore" type="integer" column="status_before" nullable="true"/>
+    <field name="statusAfter" type="integer" column="status_after" nullable="true"/>
+    <many-to-one field="decklist" target-entity="AppBundle\Entity\Decklist" fetch="LAZY">
+      <join-columns>
+        <join-column name="decklist_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="moderator" target-entity="AppBundle\Entity\User" fetch="LAZY">
+      <join-columns>
+        <join-column name="user_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

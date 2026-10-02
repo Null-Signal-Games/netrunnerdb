@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Card;
+use AppBundle\Repository\CardRepository;
 use AppBundle\Service\CardsData;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -35,8 +36,11 @@ class FactionController extends Controller
         $result = [];
         $banned_cards = array();
 
+        /** @var CardRepository $cardRepository */
+        $cardRepository = $entityManager->getRepository(Card::class);
+
         foreach ($factions as $faction) {
-            $identities = $entityManager->getRepository(Card::class)->findByFaction($faction);
+            $identities = $cardRepository->findByFaction($faction);
             $identitiesGroupsByName = CardsData::groupCardsByTitle($identities);
 
             // build the list of the top $decklists_per_id decklists per id

@@ -283,9 +283,9 @@ class BuilderController extends Controller
 
         $content = [];
         foreach ($cardcrawler as $domElement) {
-            $quantity = intval($domElement->getAttribute('qty'));
+            $quantity = intval($domElement->attributes['qty']);
             $matches = [];
-            if (preg_match('/bc0f047c-01b1-427f-a439-d451eda(\d{5})/', $domElement->getAttribute('id'), $matches)) {
+            if (preg_match('/bc0f047c-01b1-427f-a439-d451eda(\d{5})/', $domElement->attributes['id'], $matches)) {
                 $card_code = $matches[1];
             } else {
                 continue;
@@ -1308,7 +1308,7 @@ class BuilderController extends Controller
 
         $diff = (array) json_decode($request->get('diff'));
         if (count($diff) != 2) {
-            throw new BadRequestHttpException("Wrong content " . $diff);
+            throw new BadRequestHttpException("Wrong content " . $request->get('diff'));
         }
         if (count((array) $diff[0]) || count((array) $diff[1])) {
             $change = new Deckchange();

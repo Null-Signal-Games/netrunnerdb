@@ -14,7 +14,7 @@ services:
 
     AppBundle\:
         resource: '../../src/AppBundle/*'
-        exclude: '../../src/AppBundle/{Behavior,DataFixtures,DQL,Entity,Repository,Resources}'
+        exclude: '../../src/AppBundle/{Behavior,DQL,Entity,Repository,Resources}'
 
     AppBundle\EventListener\DecklistListener:
         tags:
