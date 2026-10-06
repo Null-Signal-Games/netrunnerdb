@@ -1,6 +1,6 @@
 <form method="GET" action="{{ path('decklists_list', {type:'find'}) }}"
       role="form">
-    <div class="row" style="margin-bottom:1em">
+    <div class="row">
         <div class="col-sm-4">
             <div class="form-group">
                 <label for="">Side or Faction</label> <select class="form-control"
@@ -48,7 +48,7 @@
                 </select>
             </div>
         </div>
-        <div class="col-sm-4" style="margin-bottom:15px">
+        <div class="col-sm-4">
             <div class="form-group">
                 <label for="">Author name</label> <input type="text"
                                                          class="form-control" id="author" name="author"
@@ -78,7 +78,6 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Search</button>
         </div>
         <div class="col-sm-4">
             <label for="">Filter by card pool</label>
@@ -111,6 +110,11 @@
                     </div>
                 {% endfor %}
             </div>
+        </div>
+    </div>
+    <div class="row" style="margin-block: 1em;">
+        <div class="col-sm-4 col-sm-offset-4">
+            <button type="submit" class="btn btn-primary btn-block">Search</button>
         </div>
     </div>
 </form>
