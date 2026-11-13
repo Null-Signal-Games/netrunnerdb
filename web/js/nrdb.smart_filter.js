@@ -131,10 +131,13 @@
       }});
       break;
     case "!":
-      SmartFilterQuery.push({[key]: {
+      var exclusion = {[key]: {
         '$nee': null,
         '$nin' : values
-      }});
+      }};
+      SmartFilterQuery.push(key === 'keywords' ? {
+        '$or': [{[key]: null}, {[key]: {'$exists': false}}, exclusion]
+      } : exclusion);
       break;
     }
   }
